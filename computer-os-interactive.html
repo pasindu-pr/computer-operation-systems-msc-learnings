@@ -325,8 +325,8 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
     <section class="module active" id="m-home">
       <div class="hero">
         <span class="kicker">MSc · Computer Operating Systems</span>
-        <h1>Understand it. See it move. Never forget it.</h1>
-        <p>This lab turns your five lecture decks into <b>animated demos, hands-on simulators and instant-feedback quizzes</b>. Every concept from the slides is here — explained in plain English, tied to a real-world story, and made clickable so it sticks.</p>
+        <h1>Learn the ideas in everyday language.</h1>
+        <p>This lab keeps the <b>full theory from the lectures</b>, but explains it as a helpful tutor would: first the simple idea, then the correct technical terms, then a small example you can follow.</p>
         <div class="metarow">
           <div><b>5</b><span>Modules</span></div>
           <div><b>12+</b><span>Interactive simulators</span></div>
@@ -339,7 +339,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
         <h3 class="h3">🧭 How to use this lab (read this first)</h3>
         <ul class="clean">
           <li><b>Go module by module</b> using the left menu — they follow your slide order exactly.</li>
-          <li>Each idea has three parts: <b class="key">the concept</b> → <b class="key">a real-world analogy</b> → <b class="key">a thing you can play with</b>.</li>
+          <li>For each topic, read it in this order: <b class="key">simple meaning</b> → <b class="key">full theory</b> → <b class="key">worked example or simulator</b>.</li>
           <li>Anything in an <span class="chip" style="padding:2px 10px">orange lab box</span> is <b>interactive</b> — click buttons, drag sliders, run the simulator. Doing beats reading.</li>
           <li>Hit <b>"Mark section understood"</b> at the end of each section — your progress bar (bottom-left) fills up and is saved in your browser.</li>
           <li>Finish with the <b>🎯 Exam Drill Zone</b>, built from your actual tutorial question sheets.</li>
@@ -371,16 +371,16 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <div class="hero">
         <span class="kicker">Module 1</span>
         <h1>⚡ Low-Level Hardware Support for the OS</h1>
-        <p>Before an OS can manage anything, the <b>hardware</b> must give it special powers: a way to grab the CPU's attention (interrupts), a way to lock users out of dangerous instructions (dual mode), and ways to protect memory, time, and I/O. This module is the foundation for everything else.</p>
+        <p>An operating system cannot protect the computer by software alone. The <b>hardware must help it</b>. In this module you will see how interrupts return control to the OS, CPU modes restrict dangerous instructions, and hardware protects memory, processor time and I/O.</p>
       </div>
 
       <!-- 1.1 Interrupts -->
       <h2 class="sec"><span class="n">1</span> Interrupt-Driven Operation</h2>
-      <p class="sec-sub">How devices and the CPU work at the same time without the CPU wasting its life waiting.</p>
+      <p class="sec-sub">Simple idea: a device tells the CPU when it needs attention, so the CPU does not have to keep checking it.</p>
 
       <div class="card">
-        <p class="lead">The CPU and I/O devices (disk, keyboard, network card…) can <b class="key">run concurrently</b>. The problem: how does a slow device tell the fast CPU “I'm done!” without the CPU standing around checking constantly?</p>
-        <p>The answer is the <span class="term">interrupt</span>: <em>a signal that stops the currently executing program because some other code urgently needs to run to deal with a request for service.</em></p>
+        <p class="lead"><b>In simple words:</b> the CPU can work on a program while a disk, keyboard or network device works at the same time. This is called <b class="key">concurrent operation</b>.</p>
+        <p>When a device finishes or needs service, it sends an <span class="term">interrupt</span>. The CPU pauses its current program, runs the operating-system code that handles the event, and can then continue. Without interrupts, the CPU would waste time repeatedly asking, “Are you finished yet?”</p>
         <ul class="clean">
           <li>Each I/O device type has a <b class="key">device controller</b> that controls that device.</li>
           <li>Each controller has a <b class="key">local buffer</b> (small on-board memory).</li>
@@ -391,7 +391,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
 
       <div class="note analogy">
         <span class="tag">🍽️ Real-world analogy — The restaurant kitchen</span>
-        You're a chef (the <b>CPU</b>). You put bread in the toaster (a <b>device</b>) and <b>walk away to chop vegetables</b> — you don't stare at the toaster. When toast is ready, the toaster <b>“dings”</b> (the <b>interrupt</b>). You pause chopping, grab the toast (<b>handle the interrupt</b>), then go back to exactly where you left off in chopping. That “ding” is why you can cook ten things at once instead of babysitting one.
+        You are the chef (<b>CPU</b>). You start the toaster (<b>device</b>) and chop vegetables while it works. Its “ding” is the <b>interrupt</b>. You pause, deal with the toast, and continue chopping. The important point is not that both jobs use the CPU; it is that the device works independently and only signals the CPU when service is needed.
       </div>
 
       <div class="lab">
@@ -437,8 +437,8 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
         <ul class="clean">
           <li>The <span class="term">ISR (Interrupt Service Routine)</span> is part of the OS and carries out the right action for that interrupt type.</li>
           <li>When the ISR finishes, the OS either <b>restores the interrupted program's saved registers</b>, or <b>calls the scheduler</b> to decide if a different program should run next.</li>
-          <li>New interrupts are <b class="key">disabled while one is being processed</b> — this prevents a “lost interrupt”.</li>
-          <li>But interrupts have <b class="key">priorities</b>: a higher-priority interrupt <em>can</em> interrupt a lower-priority one.</li>
+          <li>In the simple scheme used in the lecture, new interrupts are <b class="key">masked while one is being processed</b> so the current interrupt is handled safely and another is not lost.</li>
+          <li>Real systems can use <b class="key">interrupt priorities</b>: a higher-priority interrupt may interrupt a lower-priority ISR, while equal or lower priorities remain masked.</li>
         </ul>
       </div>
 
@@ -468,9 +468,9 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
 
       <!-- 1.3 Dual mode -->
       <h2 class="sec"><span class="n">2</span> CPU Dual-Mode Operation</h2>
-      <p class="sec-sub">Stopping one buggy or malicious program from wrecking everyone else's.</p>
+      <p class="sec-sub">Simple idea: ordinary programs receive limited CPU permissions; the OS receives full permissions.</p>
       <div class="card">
-        <p class="lead">Many user programs run together (browser, Word, music player…) and <b>share</b> the CPU, memory and devices. A normal program <b>must not</b> be allowed to run instructions that could corrupt other programs. So the CPU has (at least) <b class="key">two modes</b>:</p>
+        <p class="lead">Your browser, editor and music player share the computer. If any one of them could directly control devices, change protection registers or stop another process, one bug could damage the whole system. The CPU therefore provides at least <b class="key">two execution modes</b>:</p>
         <table class="cmp">
           <tr><th>Mode</th><th>Who runs here</th><th>Powers</th></tr>
           <tr><td>User mode <span class="mono">(bit = 1)</span></td><td>User programs</td><td>Only a <b>subset</b> of the instruction set is allowed</td></tr>
@@ -480,13 +480,13 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
           <li>A <b class="key">mode bit</b> in hardware records the current mode (0 = supervisor, 1 = user).</li>
           <li><span class="term">Privileged instructions</span> can only run in supervisor mode (e.g. “kill a running program”, load base/limit registers, do I/O, load the timer). <b>Changing the mode bit is itself privileged.</b></li>
           <li><b>How the switch happens:</b> when an interrupt/fault occurs → hardware switches to <b>supervisor</b> mode. When the OS restarts a user program → switches back to <b>user</b> mode.</li>
-          <li><b>Key guarantee:</b> the CPU only enters supervisor mode <em>through</em> an interrupt, and the interrupt hands control to an ISR which <b>is part of the OS</b>. So <b class="key">only the OS ever runs in supervisor mode</b> — a user program can never seize the machine in supervisor mode.</li>
+          <li><b>Key guarantee in this lecture model:</b> an interrupt, exception or system call transfers control through a protected entry point into OS code and changes the mode to supervisor. A protected return changes it back to user mode. A user program cannot set the mode bit itself.</li>
         </ul>
       </div>
 
       <div class="note analogy">
         <span class="tag">🏨 Real-world analogy — The hotel keycard</span>
-        Guests get a <b>keycard (user mode)</b> that opens only their own room. Staff have a <b>master key (supervisor mode)</b> that opens everything. You can't upgrade your own card to a master key — only the front desk (the OS, via a controlled request) can. If a guest tries a door that isn't theirs, the lock refuses (a protection fault). That's dual mode: normal users are deliberately limited so one guest can't ransack another's room.
+        A guest keycard (<b>user mode</b>) opens only permitted doors. A staff master key (<b>supervisor mode</b>) opens protected areas. A guest cannot turn their card into a master key; they must ask the front desk through a controlled request. In the same way, a program asks the OS through a <b>system call</b> instead of running a privileged instruction itself.
       </div>
 
       <div class="lab">
@@ -503,19 +503,19 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
 
       <div class="note warn">
         <span class="tag">⚠️ Why memory protection becomes necessary</span>
-        If a user program could write its own code into the <b>interrupt vector</b>, then when an interrupt fires the CPU would jump to <em>the user's code</em> while in <b>supervisor mode</b> — game over. That's exactly why the system also needs <b>memory protection</b> (next section).
+        If a user program could overwrite an <b>interrupt-vector entry</b> or an ISR, the CPU might enter supervisor mode and jump into attacker-controlled code. The vector table and kernel code must therefore be stored in memory that user mode cannot modify.
       </div>
 
       <!-- 1.4 memory protection -->
       <h2 class="sec"><span class="n">3</span> Memory Protection — Base & Limit Registers</h2>
-      <p class="sec-sub">Fencing off each program so it can only touch its own memory.</p>
+      <p class="sec-sub">Simple idea: hardware checks every user-mode memory address before allowing the access.</p>
       <div class="card">
-        <p class="lead">A simple hardware mechanism uses two registers:</p>
+        <p class="lead"><b>In simple words:</b> each process is given an allowed stretch of physical memory. Two protected registers describe that stretch:</p>
         <ul class="clean">
           <li><b class="key">Base register</b> — holds the <b>smallest legal physical address</b> the program may touch.</li>
           <li><b class="key">Limit register</b> — holds the <b>size</b> (range) of the allowed region.</li>
         </ul>
-        <p>Every address a program generates is checked: it's legal only if <span class="mono">base ≤ address &lt; base + limit</span>. Any access outside the range triggers an <b>error interrupt</b> into the OS. Loading the base and limit registers is a <b class="key">privileged instruction</b>. In supervisor mode the OS bypasses this and can touch all memory.</p>
+        <p>For the lecture's physical-address check, an access is legal only when <span class="mono">base ≤ address &lt; base + limit</span>. Example: base = 300,000 and limit = 120,000 allow addresses 300,000 through 419,999; address 420,000 is outside the region. An illegal access causes a protection exception/trap to the OS. Only the OS can load these registers, and supervisor-mode OS code can access all memory.</p>
       </div>
 
       <div class="lab">
@@ -538,17 +538,17 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 1.5 CPU protection / timer -->
       <h2 class="sec"><span class="n">4</span> CPU Protection — The Timer</h2>
       <div class="card">
-        <p class="lead">What if a user program enters an <b>infinite loop</b> and never gives the CPU back? The OS needs a way to regain control. Enter the <span class="term">timer</span>:</p>
+        <p class="lead"><b>In simple words:</b> the OS sets an alarm before giving the CPU to a program. Even if that program enters an <b>infinite loop</b>, the alarm returns control to the OS.</p>
         <ul class="clean">
           <li>The timer <b>interrupts the computer after a set time elapses</b>, guaranteeing the OS gets control back.</li>
           <li>It is <b>decremented every clock tick</b>; when it hits <b>0</b>, an interrupt occurs.</li>
           <li>Used to implement <b class="key">time-sharing</b> (slicing CPU time between programs) and to <b>compute the current time</b>.</li>
-          <li>Loading the timer is — you guessed it — a <b class="key">privileged instruction</b>.</li>
+          <li>Loading or disabling the timer is a <b class="key">privileged instruction</b>, so a user process cannot prevent the OS from regaining control.</li>
         </ul>
       </div>
       <div class="note analogy">
         <span class="tag">⏲️ Real-world analogy — The debate moderator's buzzer</span>
-        Each speaker (program) gets 2 minutes. A <b>buzzer (timer)</b> goes off when time's up, and the <b>moderator (OS)</b> cuts the mic and moves to the next speaker — even if the current one wanted to talk forever. Without the buzzer, one long-winded speaker (an infinite loop) would hijack the whole event.
+        Each speaker (<b>program</b>) gets a time slot. The moderator (<b>OS</b>) sets a buzzer (<b>timer</b>) before handing over the microphone. When it rings, the moderator regains control and may choose the next speaker. Loading the timer is privileged, so a speaker cannot secretly give themselves unlimited time.
       </div>
 
       <!-- 1.6 I/O structure -->
@@ -556,25 +556,25 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <div class="grid2">
         <div class="card">
           <h3 class="h3" style="margin-top:0">🔒 Synchronous I/O</h3>
-          <p>After I/O starts, control returns to the program <b>only when the I/O is fully complete</b>.</p>
+          <p>The requesting program continues past the I/O operation <b>only after the operation completes</b>.</p>
           <ul class="clean"><li>CPU <b>waits</b> — either goes idle until the next interrupt, or sits in a <b>busy loop</b> polling the device.</li><li><b>At most one</b> I/O request outstanding at a time. No overlap.</li></ul>
         </div>
         <div class="card">
           <h3 class="h3" style="margin-top:0">⚡ Asynchronous I/O</h3>
-          <p>After I/O starts, control returns to the program <b>immediately</b>, without waiting.</p>
+          <p>The request is started and control returns <b>without waiting for completion</b>. The device and CPU can then work concurrently.</p>
           <ul class="clean"><li>Needs a <b class="key">device-status table</b> — one entry per device with its type, address and state.</li><li><b>Multiple requests</b> can be queued (linked list) per device.</li><li>OS indexes into the table to check each device's status.</li></ul>
         </div>
       </div>
       <div class="note analogy">
         <span class="tag">☕ Real-world analogy — Ordering coffee</span>
-        <b>Synchronous:</b> you order, then <b>stand at the counter staring</b> until your latte is done — you can't do anything else. <b>Asynchronous:</b> you order, they give you a <b>buzzer</b>, you go sit down and read (do other work); the buzzer (interrupt) calls you back when it's ready. Async lets the barista handle <b>many orders at once</b>.
+        <b>Synchronous:</b> you order and wait until the drink is ready before continuing. <b>Asynchronous:</b> you receive a buzzer, do something else, and return when it rings. The buzzer is like a completion interrupt. The exact theory is about when control returns to the requester, not simply whether the physical CPU is idle.
       </div>
 
       <!-- 1.7 I/O protection + system calls -->
       <h2 class="sec"><span class="n">6</span> I/O Protection & System Calls</h2>
       <div class="card">
         <p class="lead">All I/O instructions are <b class="key">privileged</b> — so a user program can't directly grab a device and mess with another program's data. But then… <b>how does a user program do I/O at all?</b></p>
-        <p>Through a <span class="term">system call</span>: a request for a service from the OS kernel (create a process, read the disk, open a file…). It's the <b>interface between a process and the OS</b>.</p>
+        <p>It uses a <span class="term">system call</span>: a controlled request to the kernel, such as creating a process, opening a file or reading from a device. A system call is the service interface between a running process and the OS.</p>
         <h3 class="h3">How a system call actually works</h3>
         <div class="flow">
           <div class="box">Program issues a <b>trap</b> (software interrupt)</div><span class="arr">→</span>
@@ -602,7 +602,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 1.8 DMA -->
       <h2 class="sec"><span class="n">7</span> Direct Memory Access (DMA)</h2>
       <div class="card">
-        <p class="lead"><span class="term">DMA</span> lets an I/O controller move blocks of data <b>directly to/from main memory without bothering the CPU</b>.</p>
+        <p class="lead"><span class="term">Direct Memory Access (DMA)</span> lets a DMA-capable controller transfer a block between an I/O device and main memory. The CPU sets up the transfer, continues other work, and is normally interrupted when the block is complete.</p>
         <ul class="clean">
           <li>Used for <b>high-speed devices</b> that transmit near memory speed.</li>
           <li>The controller transfers whole <b>blocks</b> straight to memory using <b class="key">cycle stealing</b> (borrowing memory-bus cycles).</li>
@@ -611,7 +611,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       </div>
       <div class="note analogy">
         <span class="tag">🚚 Real-world analogy — Bulk delivery vs one parcel at a time</span>
-        Without DMA, the CPU is a manager who <b>personally carries every single parcel</b> from the loading dock (device) to the warehouse (memory) — one interrupt per byte. With DMA, you hire a <b>delivery truck (DMA controller)</b> that hauls a whole pallet (block) directly into the warehouse and only <b>rings the bell once</b> when the entire pallet is delivered. The manager is free to do real work the whole time.
+        Think of the CPU as a manager and the DMA controller as a delivery team. The manager gives the team the pickup point, destination and block size. The team moves the block and reports once at the end. The CPU is still involved in setting up and completing the operation, but it does not copy every byte itself.
       </div>
 
       <!-- 1.9 memory hierarchy -->
@@ -633,7 +633,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
 
       <div class="card">
         <h3 class="h3">The Caching Principle</h3>
-        <p><span class="term">Caching</span> = keeping a <b>copy</b> of some information from a slower medium on a <b>faster</b> one. The cache holds the info <b>currently being used</b>. In fact, <b>main memory can be seen as a fast cache for secondary storage</b>.</p>
+        <p><span class="term">Caching</span> means keeping a <b>copy</b> of likely-needed data in faster storage. On a hit, the fast copy is used; on a miss, data is fetched from the slower level and may be copied into the cache. In the storage hierarchy, RAM can be viewed as a cache for secondary storage.</p>
         <div class="note warn"><span class="tag">The core challenge of caching</span> You must maintain a <b>mapping</b> between the copy and the original, and keep them <b>consistent</b> (if you change the copy, the original must eventually match). Example: a <b>disk cache</b> (e.g. 64&nbsp;MB) sits between the slow disk and the faster microprocessor, holding recently used clusters.</p></div>
       </div>
 
@@ -645,13 +645,13 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <div class="hero">
         <span class="kicker">Module 2</span>
         <h1>🪟 Overview of Windows Operating Systems</h1>
-        <p>Where Windows came from, what its designers were trying to achieve, and how it's built inside — from the hardware-hugging bottom layer up to the programs you click on.</p>
+        <p>This module follows the lecture's historical view of Windows, then explains the Windows NT design from bottom to top: hardware, HAL, drivers, kernel, Executive, system libraries, services and applications.</p>
       </div>
 
       <!-- 2.1 evolution -->
       <h2 class="sec"><span class="n">1</span> The Evolution of Windows</h2>
       <div class="card">
-        <p class="lead">Windows split early into <b>two separate families</b> with <b>completely separate code</b> — expensive to maintain — until Windows 2000 began merging them.</p>
+        <p class="lead"><b>Big picture:</b> Microsoft once maintained two Windows families. The consumer family kept compatibility with MS-DOS; the NT family was a newer design focused on reliability and security. Windows 2000 brought NT to the business desktop, and Windows XP later placed both consumer and business editions on the NT code base.</p>
         <div class="grid2">
           <div class="note" style="margin:0"><span class="tag2" style="font-weight:800">🏠 Domestic / consumer line</span>
             <b>Windows 95, 98, ME</b> — still built on legacy <b>MS-DOS</b> code (DOS handled things like the file system), so old code ran slower and these were often <b>unstable</b>.</div>
@@ -670,7 +670,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <div class="card">
         <h3 class="h3">Early versions & the DOS front-end</h3>
         <p>Windows <b>1.0 / 2.0 / 3.0 / 3.1</b> were essentially a <b>GUI front-end</b> on top of the command-line MS-DOS. <b>Windows 95</b> added 32-bit apps, <b>Plug &amp; Play</b>, virtual memory, multitasking and long filenames — but was still DOS-based underneath.</p>
-        <p><b>2000 → XP → Vista → 7 → 8 → 10:</b> Windows 2000 re-branded NT 5 for both markets; XP was essentially NT 5.1; Vista was NT 6; Windows 7 rewrote the Vista kernel for speed; Windows 8 brought a new touch-friendly interface for desktop <b>and</b> tablets; Windows 10 added the <b>Cortana</b> assistant (like Siri/Google Assistant/Alexa) and <b>HoloLens</b> AR.</p>
+        <p><b>2000 → XP → Vista → 7 → 8 → 10:</b> Windows 2000 was NT 5.0; XP was NT 5.1 and completed the move of mainstream consumer Windows to the NT family; Vista was NT 6.0; Windows 7 refined Vista's NT 6.x base; Windows 8 introduced a touch-focused interface for PCs and tablets; and the lecture highlights Cortana and HoloLens in the Windows 10 period.</p>
       </div>
 
       <!-- 2.2 versions/builds -->
@@ -680,7 +680,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
         <table class="cmp">
           <tr><th>Term</th><th>What it actually means</th></tr>
           <tr><td>Version number</td><td>The point in the <b>evolution from Windows NT</b> (e.g. Windows 7 is internally NT 6.1).</td></tr>
-          <tr><td>Build number</td><td><b>How many times the software components have been compiled together</b> to produce a complete running OS.</td></tr>
+          <tr><td>Build number</td><td>An identifier for a particular compiled release of Windows. A larger build usually means a later build, but it should be treated as a release identifier rather than a literal count of every compilation.</td></tr>
           <tr><td>Service Pack (SP)</td><td>A <b>bundle of updates and bug fixes (patches)</b> packaged for convenience. Windows XP had 3 service packs.</td></tr>
         </table>
         <p>Two PCs can have <b>different builds/service packs</b> but the <b>same version number</b> (e.g. both “NT 10”).</p>
@@ -695,11 +695,11 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 2.4 OS models + architecture -->
       <h2 class="sec"><span class="n">4</span> Windows NT Internal Architecture</h2>
       <div class="card">
-        <p class="lead">Reminder — three classic OS models: <b>Monolithic</b>, <b>Layered</b>, and <b>Client/Server</b>. Windows NT uses a <b class="key">mixed design</b>: predominantly <b>layered/modular</b>, plus <b>client/server</b> on top.</p>
+        <p class="lead"><b>Start with the simple idea:</b> Windows NT is not explained well by one architecture label. It combines ideas from the <b>monolithic</b>, <b>layered/modular</b> and <b>client/server</b> models.</p>
         <ul class="clean">
           <li><b>Layered portion:</b> Hardware Abstraction Layer (HAL) → Device drivers & Kernel → NT Executive.</li>
           <li><b>Client/server portion:</b> the subsystems and Windows services that user programs call.</li>
-          <li>Core components follow <b>Object-Oriented design principles</b> — one module never touches another's data directly, only through a <b>defined interface</b>. (Interesting twist: most of Windows is written in <b>C</b>, not C++, because C++ was barely invented when NT started — so C is used to <em>mimic</em> OO structure.)</li>
+          <li>Core components use <b>object-based and modular design principles</b>: components have clear responsibilities and communicate through defined interfaces. Much of NT was implemented in C, but its internal object model still provides encapsulated OS objects.</li>
         </ul>
       </div>
 
@@ -713,7 +713,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 2.5 NT executive components -->
       <h2 class="sec"><span class="n">5</span> Inside the NT Executive</h2>
       <div class="card">
-        <p class="lead">The <b>NT Executive</b> is hardware-independent and organised as a set of peer modules that talk through defined interfaces. It exposes OS functions to applications via <code>Ntdll.dll</code>. Here are its components — flip each card to learn its one-line job.</p>
+        <p class="lead">The <b>NT Executive</b> is a collection of mostly hardware-independent kernel-mode managers. Each manager has a focused job and uses defined interfaces to work with the others. User-mode environment subsystems reach native system services through routines in <code>ntdll.dll</code>.</p>
       </div>
       <div class="flip-grid" id="ntExec"></div>
 
@@ -721,10 +721,10 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
         <h3 class="h3">The bottom & top of the stack</h3>
         <ul class="clean">
           <li><b class="key">HAL (Hardware Abstraction Layer):</b> low-level interface that <b>hides hardware-specific details</b>, giving other OS parts a common way to access hardware. The right HAL is chosen at install time.</li>
-          <li><b class="key">Device drivers:</b> software controlling I/O devices, file systems (NTFS, Ext2) and network access (TCP/IP). In Windows they don't touch hardware directly — they call the <b>HAL</b>.</li>
+          <li><b class="key">Device drivers:</b> kernel software for devices and software devices such as file-system and network drivers. Hardware drivers use Windows kernel and HAL interfaces to deal with platform-specific hardware details.</li>
           <li><b class="key">Kernel (Ntoskrnl.exe):</b> gives other components a common set of processor services regardless of CPU architecture. Handles <b>thread scheduling, synchronisation, interrupt/exception handling, context switching</b>, and manages kernel objects.</li>
           <li><b class="key">Subsystems & services (user mode):</b> environmental subsystems let programs written for other OSes run on Windows; support processes provide logon, spooling, etc. — organised client/server.</li>
-          <li><b class="key">NTDLL:</b> a system interface library that translates subsystem API requests into <b>system calls</b> to NT Executive modules. <code>.dll</code> = <b>Dynamic Linked Library</b> — reusable code modules with <b>no <code>main()</code></b> of their own.</li>
+          <li><b class="key">NTDLL:</b> a user-mode system library containing the native API and low-level system-call entry routines used by Windows subsystems. A <code>.dll</code> is a <b>dynamic-link library</b>: code and data that programs can load and reuse.</li>
         </ul>
       </div>
 
@@ -744,22 +744,22 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <div class="hero">
         <span class="kicker">Module 3</span>
         <h1>🐧 Linux Shells & Bash Scripting</h1>
-        <p>The shell is your conversation with the OS. This module covers the shell types, the “magic” of pipes and redirection, the core commands, regular expressions, and writing your first scripts — with a live terminal you can actually type into.</p>
+        <p>A shell reads commands and asks the operating system to perform them. This module keeps the full command-line theory, but explains each symbol by following where its input and output go.</p>
       </div>
 
       <!-- 3.1 shells -->
       <h2 class="sec"><span class="n">1</span> What is a Shell?</h2>
       <div class="card">
-        <p class="lead">A <span class="term">shell</span> acts as an <b>interpreter between you and the operating system</b> — an advanced way to converse with the system. It gives you access to commands, scripts and libraries, and talks to the <b>kernel</b> on your behalf.</p>
+        <p class="lead">A <span class="term">shell</span> is a command interpreter. It reads what you type, expands shell syntax such as variables and wildcards, runs built-in commands or starts programs, and reports their output and exit status. Those programs use system calls to request services from the kernel.</p>
         <table class="cmp">
           <tr><th>Shell</th><th>Character</th></tr>
           <tr><td>sh (Bourne)</td><td>The <b>original</b> UNIX shell. Small, basic, few features.</td></tr>
-          <tr><td>bash (Bourne Again)</td><td>The standard <b>GNU</b> shell and the default on Linux. A <b>superset of sh</b> — everything that works in sh works in bash (not always the reverse). Intuitive yet powerful.</td></tr>
+          <tr><td>bash (Bourne Again)</td><td>The GNU shell commonly used as the interactive default on Linux. It is largely compatible with Bourne/POSIX shell syntax and adds features of its own; a Bash-specific script may not run under plain <code>sh</code>.</td></tr>
           <tr><td>csh (C shell)</td><td>Syntax resembles the <b>C language</b>. Added the useful <b>history</b> feature and job control.</td></tr>
           <tr><td>tcsh (Turbo C)</td><td>A superset of csh — more user-friendly and faster.</td></tr>
           <tr><td>ksh (Korn)</td><td>A superset of the Bourne shell, liked by people with a UNIX background.</td></tr>
         </table>
-        <p>In Linux, <b>“everything is a file.”</b> The list of valid installed shells lives in <code>/etc/shells</code>. To see your own shell: <code>echo $SHELL</code>.</p>
+        <p>Linux uses a broad <b>file-like interface</b>: ordinary files, devices, pipes and many kernel interfaces can be opened, read or written in similar ways. The approved login shells are commonly listed in <code>/etc/shells</code>. <code>echo $SHELL</code> shows your configured login shell; it may not identify a different shell started inside the current session.</p>
       </div>
 
       <!-- 3.2 pipes & redirection -->
@@ -767,12 +767,12 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <div class="grid2">
         <div class="card">
           <h3 class="h3" style="margin-top:0">| Piping</h3>
-          <p>Takes the <b>output of one command</b> and feeds it as the <b>input to the next</b>. Data flows through a pipeline of processes.</p>
+          <p>Connects the first command's <b>standard output</b> to the next command's <b>standard input</b>. Each command can do one small job, and the pipeline combines them.</p>
           <div class="code"><span class="p">command1</span> | <span class="p">command2</span> | <span class="p">command3</span></div>
         </div>
         <div class="card">
           <h3 class="h3" style="margin-top:0">&gt; Redirection</h3>
-          <p>Sends output <b>away from the screen</b> to somewhere else — usually a file.</p>
+          <p>Changes where a command reads input or writes output. <code>&gt;</code> writes standard output to a file and replaces that file's old contents; <code>&gt;&gt;</code> appends instead.</p>
           <div class="code"><span class="p">ls</span> -R / | <span class="p">grep</span> httpd.conf <span class="g">&gt;</span> results.txt</div>
         </div>
       </div>
@@ -789,10 +789,10 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
           <tr><td>&gt;</td><td>redirect</td><td>Output redirection (overwrite file)</td></tr>
           <tr><td>&gt;&gt;</td><td>append</td><td>Append output to file</td></tr>
           <tr><td>&lt;</td><td>input redirect</td><td>Feed a file in as input</td></tr>
-          <tr><td>;</td><td>semicolon</td><td>Run commands in sequence (each is its own process/PID)</td></tr>
+          <tr><td>;</td><td>semicolon</td><td>Run commands in sequence, whether the previous command succeeds or fails</td></tr>
           <tr><td>&amp;&amp;</td><td>and</td><td>Run 2nd command <b>only if</b> the 1st <b>succeeds</b></td></tr>
           <tr><td>||</td><td>or</td><td>Run 2nd command <b>only if</b> the 1st <b>fails</b></td></tr>
-          <tr><td>&amp;</td><td>ampersand</td><td>Run a job in the <b>background</b> (in a subshell)</td></tr>
+          <tr><td>&amp;</td><td>ampersand</td><td>Start the preceding pipeline as a <b>background job</b>; the interactive shell does not wait for it</td></tr>
           <tr><td>( )</td><td>parentheses</td><td>Run commands in a <b>subshell</b></td></tr>
         </table>
         <p style="font-size:.9rem;color:var(--ink-soft)">Handy extras: <b>Tab</b> = auto-completion. <b>history</b> = every command is logged (via the <code>HISTFILE</code> variable, e.g. <code>.bash_history</code>). Arithmetic: <code>((expr))</code>. File/string tests: <code>[[ expr ]]</code>. Predefined variables include <code>PWD</code>, <code>OLDPWD</code>, <code>PATH</code>, <code>HISTFILE</code>, <code>HISTSIZE</code>, <code>EDITOR</code>, <code>SECONDS</code>.</p>
@@ -817,22 +817,23 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 3.4 regex -->
       <h2 class="sec"><span class="n">4</span> Regular Expressions (for grep)</h2>
       <div class="card">
-        <p class="lead">A <span class="term">regular expression</span> is a <b>pattern that describes a set of strings</b>. Most letters/digits match themselves; special <b>metacharacters</b> add power (escape them with <code>\</code> to match literally).</p>
+        <p class="lead">A <span class="term">regular expression</span> describes a set of matching strings. For example, <code>[0-9]</code> means “one digit.” Most ordinary characters match themselves; metacharacters have special meanings.</p>
         <table class="cmp">
           <tr><th>Pattern</th><th>Meaning</th></tr>
           <tr><td>[0-9]</td><td>Any single digit (a <b>bracket/range</b> expression)</td></tr>
           <tr><td>[^abc]</td><td>Any character <b>not</b> a, b or c (leading <code>^</code> = negate)</td></tr>
-          <tr><td>?</td><td>Preceding item optional — matched <b>at most once</b></td></tr>
+          <tr><td>?</td><td>Preceding item optional — matched <b>zero or one</b> time</td></tr>
           <tr><td>*</td><td>Preceding item matched <b>zero or more</b> times</td></tr>
           <tr><td>+</td><td>Preceding item matched <b>one or more</b> times</td></tr>
           <tr><td>{n} / {n,} / {n,m}</td><td>Exactly n / at least n / between n and m times</td></tr>
         </table>
+        <div class="note warn"><span class="tag">grep syntax note</span> The table shows <b>extended regular-expression</b> repetition syntax. Use <code>grep -E</code> for <code>?</code>, <code>+</code> and <code>{n,m}</code> as written. With basic <code>grep</code>, those operators normally need backslashes, such as <code>\+</code> and <code>\{2,4\}</code>. To match a metacharacter literally, escape it or use suitable quoting.</div>
       </div>
 
       <!-- 3.5 scripting -->
       <h2 class="sec"><span class="n">5</span> Writing Scripts</h2>
       <div class="card">
-        <p class="lead">A <b>script</b> is a collection of commands stored in a file that the shell reads and runs as if you typed them. To run one, you must: <b>write it</b>, <b>give the shell permission to execute it</b>, and <b>put it where the shell can find it</b>.</p>
+        <p class="lead">A <b>shell script</b> is a text file containing commands. The shell reads them in order, using the same syntax you use interactively. You can run it explicitly with <code>bash scriptname</code>, or make it executable and run it as a program.</p>
         <div class="code"><span class="c">#!/bin/bash</span>          <span class="c"># the "shebang": tells the shell to use /bin/bash</span>
 <span class="c"># My first script</span>       <span class="c"># everything after # is a comment (ignored)</span>
 
@@ -840,8 +841,8 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
         <ul class="clean">
           <li><b>Line 1 — the shebang</b> <code>#!/bin/bash</code> tells the shell which interpreter to use (perl, python, etc. use the same trick).</li>
           <li><b>Comments</b> start with <code>#</code> and are vital as scripts grow.</li>
-          <li><b>Make it executable</b> with <code>chmod</code>: set permissions to <b>rwx</b> for you (read+write+execute). In the editor the filename turns from green → <b>yellow</b> to show it's now runnable.</li>
-          <li><b>Run it</b> with a leading <code>./</code> — e.g. <code>./first_script</code>.</li>
+          <li><b>Make it executable</b> with <code>chmod u+x first_script</code>. The execute bit is what matters; terminal colours vary by theme and are not part of the permission model.</li>
+          <li><b>Run it from the current directory</b> with <code>./first_script</code>. The <code>./</code> is needed when the current directory is not in <code>PATH</code>.</li>
         </ul>
       </div>
       <div class="note"><span class="tag2" style="font-weight:800">🔑 The passwd file format</span> A recurring exam favourite. Each line of <code>/etc/passwd</code> is:<br><code>username:password:UID:GID:GECOS:home_directory:shell</code><br>So <code>cut -d: -f1 /etc/passwd</code> grabs field 1 (the username), using <code>:</code> as the delimiter. Pipe it into <code>| sort</code> to alphabetise.</div>
@@ -862,33 +863,33 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <div class="hero">
         <span class="kicker">Module 4</span>
         <h1>🧠 Virtual Memory</h1>
-        <p>The brilliant illusion that lets a 4&nbsp;GB machine run programs needing far more than 4&nbsp;GB — by keeping only the <b>pages you're using</b> in RAM and parking the rest on disk. This module has the two biggest interactive tools in the whole lab.</p>
+        <p>Virtual memory gives each process a large logical address space even when RAM is limited. The OS and hardware keep the currently useful pages in RAM and store other pages in secondary storage until they are needed.</p>
       </div>
 
       <!-- 4.1 need -->
       <h2 class="sec"><span class="n">1</span> Why We Need Virtual Memory</h2>
       <div class="card">
-        <p class="lead">Memory is a <b>limited resource</b> (e.g. 4&nbsp;GB). The problem: what if the <b>total memory needed by all processes &gt; physical memory</b>? For instance 4&nbsp;GB RAM, a 1&nbsp;TB disk, but OS + processes want 5.5&nbsp;GB.</p>
+        <p class="lead"><b>Problem:</b> RAM is limited. If the OS and active processes need 5.5&nbsp;GB but the machine has only 4&nbsp;GB of RAM, keeping every byte of every process in RAM at once is impossible.</p>
         <ul class="clean">
           <li>The <b class="key">Long-Term Scheduler</b> could just <b>refuse</b> to admit new processes until others finish and free memory — but that's restrictive.</li>
-          <li><span class="term">Virtual memory</span> is the better solution: <b>keep part of a process in RAM, leave the rest on the hard disk.</b> A machine with X physical memory can run processes whose total need is <b>&gt; X</b>.</li>
+          <li><span class="term">Virtual memory</span> allows only part of each process to be resident in RAM. Other parts remain in a disk-backed store until needed. Therefore the total virtual memory in use can exceed physical RAM, although heavy disk access makes the system much slower.</li>
           <li>The <b class="key">allocation scheme</b> decides which parts live in RAM. General idea: keep the data/instructions that are <b>being used now</b> or <b>likely to be used soon</b>. This is implemented via <b>demand paging</b> (or demand segmentation).</li>
         </ul>
         <div class="chips"><span class="chip">Logical address space can be &gt; physical</span><span class="chip">More processes can run at once</span><span class="chip">A process can be bigger than RAM</span></div>
       </div>
       <div class="note analogy">
         <span class="tag">🍳 Real-world analogy — The tiny kitchen counter</span>
-        Your <b>counter (RAM)</b> is tiny, but your <b>pantry (disk)</b> is huge. You don't put every ingredient on the counter — only what you need for the <b>current step</b> of the recipe. When the recipe needs flour that's still in the pantry, you pause, fetch it (a <b>page fault</b>), maybe put something else back to make room (<b>page replacement</b>), and continue. The illusion: you can cook a feast far bigger than your counter.
+        Your kitchen counter is <b>RAM</b>; the pantry is <b>secondary storage</b>. Ingredients for the current step stay on the counter. If the next ingredient is in the pantry, you pause to fetch it: that delay is like a <b>page fault</b>. If the counter is full, you first move something back: that is <b>page replacement</b>. The analogy explains capacity, but remember that disk is vastly slower than RAM.
       </div>
 
       <!-- 4.2 demand paging -->
       <h2 class="sec"><span class="n">2</span> Demand Paging & Page Faults</h2>
       <div class="card">
-        <p class="lead"><span class="term">Demand paging</span>: bring a page into memory <b>only when it's needed</b> — a <b class="key">“lazy” approach</b>. Processes live in secondary memory; only the required pages come into RAM.</p>
+        <p class="lead"><span class="term">Demand paging</span> loads a page into a free physical frame only when the process actually references it. This avoids loading pages that may never be used.</p>
         <ul class="clean">
-          <li>Each page-table entry has a <b class="key">valid–invalid bit</b>: <b>1</b> = page is in memory, <b>0</b> = not in memory. Initially all set to <b>0</b>.</li>
+          <li>In the lecture's demand-paging model, each page-table entry has a <b class="key">valid/invalid (resident) bit</b>: <b>1</b> means the page is currently in memory; <b>0</b> means it is not resident. At process start, none of its pages may be resident.</li>
           <li>When a process references a page whose bit is <b>0</b>, a <span class="term">page fault</span> is generated — an <b>interrupt</b> telling the OS the referenced page isn't in memory.</li>
-          <li>The OS checks the table in the <b>Process Control Block (PCB)</b>: if the reference is <b>invalid</b> (not in the address space) → <b>abort</b>; if just <b>not in memory</b> → <b>bring it in</b>.</li>
+          <li>The OS must distinguish two cases: the address may be <b>outside the process's legal address space</b>, which is an error, or it may be legal but its page is <b>not currently in RAM</b>, which can be serviced. Real page tables commonly use separate protection and presence information even when teaching diagrams combine them.</li>
         </ul>
         <h3 class="h3">Servicing a page fault</h3>
         <div class="flow">
@@ -898,7 +899,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
           <div class="box">Update page table + PCB (valid = 1)</div><span class="arr">→</span>
           <div class="box alt">Restart the instruction</div>
         </div>
-        <p><b>The very first reference to any page always causes a page fault</b> (it starts on disk).</p>
+        <p>With <b>pure demand paging</b> and no pre-paging, the first reference to a page that is not resident causes a page fault. If the OS preloads a page, its first reference can be a hit.</p>
       </div>
 
       <div class="lab">
@@ -927,18 +928,18 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 4.3 EAT -->
       <h2 class="sec"><span class="n">3</span> Performance: Effective Access Time (EAT)</h2>
       <div class="card">
-        <p class="lead">Page faults are <b>expensive</b> (context switch, interrupt, find frame, disk transfer, update tables, restart). We measure the real cost with <span class="term">EAT</span>.</p>
+        <p class="lead">A page fault is expensive because the OS must trap into the kernel, validate the address, find or free a frame, perform disk I/O, update tables and restart the instruction. <span class="term">Effective Access Time (EAT)</span> is the weighted average of normal accesses and faulting accesses.</p>
         <p>Let <b>p</b> = page-fault rate (0 ≤ p ≤ 1). If p = 0, no faults; if p = 1, every reference faults.</p>
         <div class="code" style="background:var(--primary-wash);color:var(--ink)">EAT = (1 − p) × <span class="r">memory access time</span> + p × (<span class="r">page-fault service time</span>)</div>
-        <p><b>Worked example from the slides:</b> memory access = 100&nbsp;ns, swap time = 10&nbsp;ms = 10,000,000&nbsp;ns, and p = 0.5:</p>
+        <p><b>Worked example from the slides:</b> memory access = 100&nbsp;ns, page-fault service time = 10&nbsp;ms = 10,000,000&nbsp;ns, and p = 0.5. This deliberately huge 50% fault rate shows why faults dominate:</p>
         <div class="code">EAT = (1−0.5)×100 + 0.5×(10,000,000 + 100)
     = 50 + 5,000,050
     = <span class="g">5,000,100 ns</span>   ← ~50,000× slower than the 100 ns RAM!</div>
-        <p>The lesson: <b>the page-fault rate has a huge effect</b> — even a modest fault rate wrecks performance.</p>
+        <p>The lesson: <b>the page-fault rate has a huge effect</b> because disk service is millions of nanoseconds slower than a RAM access.</p>
       </div>
       <div class="lab">
         <div class="lab-head">🧮 EAT Calculator <span class="pill">Interactive</span></div>
-        <div class="lab-desc">Drag the page-fault rate and watch how catastrophically EAT grows. This is why we work so hard to avoid faults.</div>
+        <div class="lab-desc">Drag the page-fault rate and watch EAT grow. Compare the normal-memory term with the much larger fault-service term.</div>
         <div class="controls">
           <div class="field"><label>Memory access time (ns)</label><input type="number" id="eatMem" value="100"></div>
           <div class="field"><label>Swap / fault service (ns)</label><input type="number" id="eatSwap" value="10000000"></div>
@@ -951,12 +952,12 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <h2 class="sec"><span class="n">4</span> Page-Replacement Algorithms ⭐</h2>
       <p class="sec-sub">The heart of the module and your exam. When RAM is full and a new page is needed, <b>which page do we evict?</b></p>
       <div class="card">
-        <p>We judge an algorithm by running it on a <b>reference string</b> and counting <b>page faults</b> — lower is better. The classic slide string is <code>1 2 3 4 1 2 5 1 2 3 4 5</code>.</p>
+        <p>A <b>reference string</b> records the page number used by each memory reference. Starting with empty frames, simulate an algorithm from left to right and count every reference to a non-resident page as a <b>page fault</b>. For the same string and frame count, fewer faults means better replacement performance.</p>
         <table class="cmp">
           <tr><th>Algorithm</th><th>Rule</th><th>Note</th></tr>
           <tr><td>FIFO</td><td>Evict the page that has been in memory <b>longest</b> (first in, first out)</td><td>Simple, but can suffer <b>Belady's Anomaly</b>: <em>more frames can cause more faults!</em></td></tr>
           <tr><td>Optimal (OPT)</td><td>Evict the page that <b>won't be used for the longest time in the future</b></td><td>Gives the <b>fewest possible faults</b> — but needs to see the future, so it's only a <b>theoretical benchmark</b>.</td></tr>
-          <tr><td>LRU</td><td>Evict the page <b>not used for the longest time</b> (recent past ≈ future)</td><td>The practical stand-in for Optimal. Implemented with <b>counters</b> (timestamp on each use) or a <b>stack</b> (move page to top on use; bottom = LRU).</td></tr>
+          <tr><td>LRU</td><td>Evict the page <b>whose most recent use is furthest in the past</b></td><td>Uses past behaviour as a prediction of future locality. Exact LRU can use timestamps/counters or a stack, although real systems often use cheaper approximations.</td></tr>
         </table>
       </div>
 
@@ -998,7 +999,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
           <h3 class="h3" style="margin-top:0">The Locality Model</h3>
           <p>Over any period, a process tends to reference a <b>stable set</b> of pages — a <span class="term">locality</span>. Later it shifts to a new locality; localities can overlap (some pages used throughout).</p>
           <h3 class="h3">Thrashing</h3>
-          <p>If a process lacks <b>“enough” pages</b>, its fault rate goes <b>very high</b> → it spends all its time <b>swapping pages in and out</b> instead of executing → CPU utilisation collapses. <b>Cause:</b> Σ(sizes of current localities of all processes) &gt; total physical memory.</p>
+          <p><span class="term">Thrashing</span> occurs when processes do not have enough frames for their current localities. They fault repeatedly, the paging disk becomes busy, and the CPU waits instead of doing useful work. A common condition is: the sum of all active locality sizes is greater than available physical frames.</p>
         </div>
       </div>
       <div class="note analogy">
@@ -1009,9 +1010,9 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 4.6 windows/linux VM + multilevel -->
       <h2 class="sec"><span class="n">6</span> Windows & Linux Virtual Memory + Multi-Level Page Tables</h2>
       <div class="card">
-        <p class="lead">Windows memory management is done by the <b>Virtual Memory Manager</b> (part of the NT Executive). It uses <b>4&nbsp;KB pages</b>; each process gets a <b>4&nbsp;GB virtual address space</b> (32-bit address). Both Windows and Linux use a <b class="key">multi-level page table</b>.</p>
+        <p class="lead">The lecture uses a classic <b>32-bit, 4&nbsp;KB-page model</b> for Windows and Linux. A 32-bit process can describe 4&nbsp;GB of virtual addresses, and the address is translated through a two-level page-table structure. This is the teaching model; modern 64-bit systems use larger, deeper structures and do not give every process exactly this layout.</p>
         <h3 class="h3">Why multi-level? (the key exam reason)</h3>
-        <p>A single flat page table for 4&nbsp;GB would need <code>4 × 4GB / 4K = 4&nbsp;MB</code> of <b>contiguous</b> memory — a lot to reserve in one block. A multi-level table can be <b>split into 4&nbsp;KB pages</b>, so the OS never needs one huge contiguous area.</p>
+        <p>A flat table needs 1,048,576 entries: <code>4 GB ÷ 4 KB</code>. At 4 bytes per entry, that is <b>4&nbsp;MB per process</b>. A multi-level design breaks the table into page-sized pieces, lets non-adjacent pieces live in memory, and allows unused regions of the virtual address space to have no lower-level table at all.</p>
         <div class="code">32-bit logical address:
 ┌───────────┬───────────┬──────────────┐
 │ 10 bits   │ 10 bits   │  12 bits     │
@@ -1029,7 +1030,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
 
       <div class="lab">
         <div class="lab-head">🗺️ Multi-Level Address Translator <span class="pill">Interactive</span></div>
-        <div class="lab-desc">Type a 32-bit logical address (in hex). Watch it split into Page-Directory index / Page-Table index / Offset — exactly how Windows & Linux translate.</div>
+        <div class="lab-desc">Type a 32-bit logical address in hexadecimal. The tool splits it into the page-directory index, page-table index and offset used by the lecture's classic two-level model.</div>
         <div class="controls">
           <div class="field"><label>Logical address (hex, e.g. 0x00403ABC)</label><input type="text" id="mlAddr" value="0x00403ABC" style="min-width:180px"></div>
           <button class="btn" id="mlGo">Translate ▶</button>
@@ -1040,7 +1041,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 4.7 demand segmentation -->
       <h2 class="sec"><span class="n">7</span> Demand Segmentation</h2>
       <div class="card">
-        <p>Used when there isn't enough hardware to implement demand paging. E.g. <b>OS/2</b> allocates memory in <b>segments</b>, tracked by <b>segment descriptors</b>. Each descriptor has a <b>valid bit</b>: if the segment is in memory, access continues; otherwise a <b>segment fault</b> occurs (the segmentation analogue of a page fault).</p>
+        <p><span class="term">Demand segmentation</span> is the segment-based counterpart of demand paging and was used on systems without suitable paging support. The lecture's OS/2 example tracks each segment with a descriptor and valid bit. A reference to a non-resident segment causes a <b>segment fault</b>; the OS loads the segment and restarts the instruction.</p>
       </div>
 
       <div class="section-done"><button class="done-btn" data-done="vm">✓ Mark Module 4 understood</button></div>
@@ -1051,13 +1052,13 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <div class="hero">
         <span class="kicker">Module 5</span>
         <h1>📦 Memory Management</h1>
-        <p>How addresses in your source code become real physical locations, and the schemes an OS uses to hand out memory: contiguous allocation, paging, and segmentation — with simulators for the fit-algorithms and address translation.</p>
+        <p>This module follows an address from source code to RAM, then compares the three allocation ideas in the lecture: one contiguous block, fixed-size paging and variable-size segmentation.</p>
       </div>
 
       <!-- 5.1 background + binding -->
       <h2 class="sec"><span class="n">1</span> Address Binding</h2>
       <div class="card">
-        <p class="lead">A program must be brought from disk into RAM to become a <b>process</b>. Main memory and registers are the <b>only storage the CPU can access directly</b> (registers in ~1 clock, RAM takes many cycles — a cache sits between them). A variable like <code>int count</code> is <b>symbolic</b> in your source; it must eventually become a real address. That mapping happens in stages:</p>
+        <p class="lead"><b>Start with the journey:</b> source code uses names such as <code>count</code>. The compiler and linker turn those names into machine-code addresses. When the program is loaded and runs, those addresses must refer to real locations in RAM. A running instance is a <b>process</b>.</p>
         <div class="flow">
           <div class="box">Source: symbolic<br><small>int count</small></div><span class="arr">→</span>
           <div class="box alt">Compiler → relocatable address</div><span class="arr">→</span>
@@ -1067,8 +1068,8 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
         <table class="cmp">
           <tr><th>Binding time</th><th>When address is known</th><th>Consequence</th></tr>
           <tr><td>Compile time</td><td>Process location known <b>at compile</b></td><td>Compiler writes real addresses directly. Must <b>recompile</b> if the location changes.</td></tr>
-          <tr><td>Link time</td><td>Location <b>not</b> known at compile</td><td>Compiler emits <b>relocatable</b> addresses (offsets from a base address; first word = 0).</td></tr>
-          <tr><td>Execution (run) time</td><td>Location known <b>only when run</b></td><td>Process can be <b>moved during execution</b>; hardware (base/relocation register) makes the real address for <b>every</b> reference. (e.g. C <code>malloc</code>/<code>calloc</code>.)</td></tr>
+          <tr><td>Link/load time</td><td>Final location is not known while compiling</td><td>The compiler produces <b>relocatable</b> code. The linker/loader chooses a base and converts offsets to final addresses before execution.</td></tr>
+          <tr><td>Execution (run) time</td><td>Physical location may change while the process runs</td><td>Hardware translates each logical address dynamically, so the OS can move the process without rewriting every instruction.</td></tr>
         </table>
       </div>
 
@@ -1081,7 +1082,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
         </div>
         <p style="margin-top:12px">The <span class="term">Memory-Management Unit (MMU)</span> is hardware that <b>translates logical → physical</b> before the address reaches memory. A simple MMU just <b>adds a relocation register</b> to every address the process generates.</p>
         <ul class="clean">
-          <li>Logical = physical for <b>compile-time</b> and <b>link-time</b> binding; they <b>differ</b> for <b>run-time</b> binding.</li>
+          <li>With compile/load-time binding, the address used by the running instruction is already an absolute physical address in this simple model. With run-time binding, the program issues a logical address and the MMU translates it.</li>
           <li>The old “base register” is now called the <b class="key">relocation register</b>.</li>
         </ul>
       </div>
@@ -1102,7 +1103,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 5.3 contiguous -->
       <h2 class="sec"><span class="n">3</span> Contiguous Allocation</h2>
       <div class="card">
-        <p class="lead">A process's memory is held in <b>one single contiguous area</b>. RAM is split into two parts: the <b>resident OS</b> (in low memory) and <b>user processes</b> (in high memory). Protection uses the <b>relocation + limit registers</b> (each logical address must be &lt; limit).</p>
+        <p class="lead"><span class="term">Contiguous allocation</span> puts all of one process in one unbroken physical-memory region. In the lecture model, the resident OS occupies low memory and user processes occupy higher memory. The limit checks that <code>logical address &lt; limit</code>; the MMU then adds the relocation value.</p>
         <ul class="clean">
           <li><b>Single-partition:</b> one process at a time.</li>
           <li><b>Multiple-partition:</b> several processes, one partition each. Free blocks between them are called <span class="term">holes</span>, scattered at various sizes throughout memory. When a process arrives, the OS finds a hole big enough; it tracks allocated and free partitions.</li>
@@ -1119,7 +1120,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
 
       <div class="lab">
         <div class="lab-head">🧩 Fit-Algorithm Simulator <span class="pill">Interactive</span></div>
-        <div class="lab-desc">Set memory partitions and a process to place. Run each strategy and see which hole it chooses. (Try the tutorial set: partitions 500 400 100 700 350, place 212 → 417 → 112 → 426.)</div>
+        <div class="lab-desc">Enter the <b>current free-hole sizes</b> and one arriving process. The tool shows which hole that strategy chooses. For a sequence, subtract the process size from the chosen hole, enter the updated holes, and then place the next process.</div>
         <div class="controls">
           <div class="field"><label>Partition sizes (K)</label><input type="text" id="fitParts" value="500 400 100 700 350" style="min-width:170px"></div>
           <div class="field"><label>Process size (K)</label><input type="number" id="fitProc" value="426"></div>
@@ -1153,8 +1154,8 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 5.5 paging -->
       <h2 class="sec"><span class="n">5</span> Paging</h2>
       <div class="card">
-        <p class="lead">Paging lets a process use <b>non-contiguous</b> physical memory. The process's logical memory is split into fixed-size <b>pages</b>; physical memory is split into same-size <b>frames</b> (both typically 0.5K–8K). A page loads into any free frame.</p>
-        <div class="note"><span class="tag2" style="font-weight:800">Example</span> Process = 108&nbsp;KB, page size = 10&nbsp;KB → <b>11 pages</b>: pages 0–9 are 10&nbsp;KB each, page 10 is only 8&nbsp;KB (the leftover → internal fragmentation).</div>
+        <p class="lead"><span class="term">Paging</span> removes the need for one large physical block. Logical memory is divided into equal-sized <b>pages</b>; physical memory is divided into equal-sized <b>frames</b>. Any page can occupy any free frame, and the page table records the mapping.</p>
+        <div class="note"><span class="tag2" style="font-weight:800">Worked example</span> Process = 108&nbsp;KB and page size = 10&nbsp;KB. Ten pages hold 100&nbsp;KB, so an eleventh page is needed for the remaining 8&nbsp;KB. Its 2&nbsp;KB unused part is <b>internal fragmentation</b>. For one process, the maximum waste in its last page is just under one page; if process sizes are random, the average is about half a page.</div>
         <h3 class="h3">Address translation</h3>
         <p>The CPU's address splits into <b>page number (p)</b> + <b>page offset (d)</b>. <b>p</b> indexes the <b>page table</b> to get the frame's base address; <b>d</b> is added to give the physical address. <b>Paging eliminates external fragmentation</b> but internal fragmentation can remain. There is a <b>separate page table per process</b>.</p>
       </div>
@@ -1175,7 +1176,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <div class="card">
         <h3 class="h3">Page table implementation & the TLB</h3>
         <ul class="clean">
-          <li>The page table can live in <b>main memory</b>, pointed to by the <b class="key">PTBR</b> (page-table base register); its size is in the <b class="key">PRLR</b> (length register).</li>
+          <li>The page table can live in <b>main memory</b>. The <b class="key">PTBR</b> (page-table base register) points to it, and the <b class="key">PTLR</b> (page-table length register) records its size.</li>
           <li><b>Problem:</b> every access then needs <b>two</b> memory accesses — one to read the page table, one for the data. Slow!</li>
           <li><b>Solution:</b> the <span class="term">TLB (Translation Look-aside Buffer)</span> — special fast <b>associative registers</b> that allow a <b>parallel search</b> and cache recent page→frame entries.</li>
           <li><b>Hit:</b> page number found in TLB → read frame directly. <b>Miss:</b> fetch from the page table in memory and add it to the TLB.</li>
@@ -1200,7 +1201,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <div class="card">
         <h3 class="h3">Paging — memory protection</h3>
         <ul class="clean">
-          <li>A <b class="key">valid–invalid bit</b> on each page-table entry: <b>valid</b> = page is in the process's legal address space; <b>invalid</b> = generate an error.</li>
+          <li>For <b>address-space protection</b>, a valid/invalid bit can say whether the page belongs to the process's legal logical address space. This is conceptually different from the resident/present bit used to say whether a legal page is currently in RAM.</li>
           <li>A <b class="key">protection bit</b> per entry specifies whether the frame is <b>read/write</b> or <b>read-only</b>.</li>
         </ul>
       </div>
@@ -1208,7 +1209,7 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
       <!-- 5.6 segmentation -->
       <h2 class="sec"><span class="n">6</span> Segmentation</h2>
       <div class="card">
-        <p class="lead">Segmentation divides a process's address space into <b>logical units of varying size</b> called <b>segments</b> — a program is a <b>collection of segments</b>: the main routine, groups of functions, global data/arrays/stack, or (in OO languages) individual objects.</p>
+        <p class="lead"><span class="term">Segmentation</span> follows the programmer's logical view. A program becomes variable-sized segments such as main code, a function group, global data, an array, a stack or an object. Unlike pages, these units have meaning and do not all have the same size.</p>
         <div class="note"><span class="tag2" style="font-weight:800">Pages vs Segments</span> Pages are <b>all the same size</b>; segments <b>vary in size</b>. Because segments vary, allocating them is a <b>dynamic storage-allocation problem</b> (first/best/worst-fit again).</div>
         <h3 class="h3">Segmentation architecture</h3>
         <p>A logical address is a pair <code>&lt;segment-number, offset&gt;</code>. The <b>segment number</b> indexes the <b>segment table</b> (one per process). Each entry has:</p>
@@ -1247,12 +1248,12 @@ table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
         <div class="reveal-body">
           <table class="cmp">
             <tr><th>Process</th><th>First-fit</th><th>Best-fit</th><th>Worst-fit</th></tr>
-            <tr><td>212K</td><td>500K</td><td>350K</td><td>700K</td></tr>
-            <tr><td>417K</td><td>700K</td><td>500K</td><td>500K (of remaining)</td></tr>
-            <tr><td>112K</td><td>500K→288K leftover</td><td>400K→ no… 100K too small →400K</td><td>488K leftover region</td></tr>
-            <tr><td>426K</td><td>fits in 700K leftover?</td><td>700K</td><td>must wait — no hole big enough</td></tr>
+            <tr><td>212K</td><td>500 → 288 left</td><td>350 → 138 left</td><td>700 → 488 left</td></tr>
+            <tr><td>417K</td><td>700 → 283 left</td><td>500 → 83 left</td><td>500 → 83 left</td></tr>
+            <tr><td>112K</td><td>288 → 176 left</td><td>138 → 26 left</td><td>488 → 376 left</td></tr>
+            <tr><td>426K</td><td><b>Cannot fit</b></td><td>700 → 274 left</td><td><b>Cannot fit</b></td></tr>
           </table>
-          <div class="note"><span class="tag2" style="font-weight:800">Key idea</span> <b>Best-fit</b> usually packs most efficiently here because it saves the large 700K hole for the large 426K process, whereas <b>Worst-fit</b> wastes big holes early and can leave 426K unable to fit. Work it step-by-step in the simulator to see leftovers become new holes.</div>
+          <div class="note"><span class="tag2" style="font-weight:800">Conclusion for this data set</span> <b>Best-fit</b> is the only strategy that places all four processes. This does not prove that best-fit is always best; the result depends on the hole sizes and arrival order.</div>
         </div>
       </div>
 
@@ -1282,7 +1283,7 @@ Miss + page fault (2%):       ~20 ms = 20000 µs
 EAT ≈ 0.80(1) + 0.18(2) + 0.02(20000)
     ≈ 0.8 + 0.36 + 400
     ≈ <span class="g">401.16 µs</span>   ← the 2% faults dominate everything</div>
-          <div class="note warn"><span class="tag">Lesson</span> Just <b>2%</b> page faults push EAT from ~1µs to ~400µs. Faults are the enemy.</div>
+          <div class="note warn"><span class="tag">Lesson</span> In this example, a <b>2%</b> page-fault rate raises EAT from about 1&nbsp;µs to about 400&nbsp;µs because the disk term dominates the weighted average.</div>
         </div>
       </div>
 
@@ -1314,7 +1315,32 @@ Frame number: 32 frames = 2^5 → 5 bits
         </div>
       </div>
 
-      <h2 class="sec"><span class="n">2</span> Rapid-Fire Concept Quiz</h2>
+      <h2 class="sec"><span class="n">2</span> Theory Coverage Check</h2>
+      <p class="sec-sub">Short, plain-language answers to the remaining ideas asked across both tutorial sheets.</p>
+
+      <div class="card">
+        <h3 class="h3">Memory-management comparisons</h3>
+        <ul class="clean">
+          <li><b>Compile-time vs link/load-time binding:</b> compile-time binding needs the final location early and produces absolute code; link/load-time binding keeps addresses relocatable until modules are combined or loaded. If an absolute location changes, code must be rebuilt or relocated; relocatable code can be placed at a chosen base.</li>
+          <li><b>Contiguous allocation vs paging:</b> contiguous allocation needs one large hole and uses base/limit translation; paging accepts scattered frames and uses a page table. Contiguous allocation suffers external fragmentation and may need compaction; paging removes external fragmentation but adds page-table overhead and can waste space inside the final page.</li>
+          <li><b>Internal vs external fragmentation:</b> internal waste is inside an allocated block; external waste is free space split into separate holes. Paging mainly has internal fragmentation. Variable-size contiguous allocation and segmentation can have external fragmentation.</li>
+          <li><b>Swapping:</b> the OS temporarily moves process memory between RAM and disk-backed swap space. It can let a 384&nbsp;MB application run on a 256&nbsp;MB machine if the OS supports virtual memory and the process's actively needed working set fits often enough, but performance may be poor.</li>
+          <li><b>How paging protects memory:</b> the current process can translate only through page-table entries installed by the OS, and protection bits control read/write/execute access. The OS may deliberately map a shared page into more than one process when controlled sharing is required.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">Virtual-memory decisions</h3>
+        <ul class="clean">
+          <li><b>Why Optimal cannot be implemented exactly:</b> it needs the future reference string. <b>LRU</b> uses the recent past as a prediction; exact LRU has tracking overhead and real systems may approximate it.</li>
+          <li><b>High paging-disk use + low CPU use:</b> this strongly suggests thrashing. Helpful actions include reducing multiprogramming, adding RAM, and sometimes improving paging I/O. A faster CPU does not fix the missing-frame problem.</li>
+          <li><b>Pre-paging:</b> loading predicted pages before they fault can help when the prediction is good, but wastes I/O and frames when it is wrong.</li>
+          <li><b>Larger pages:</b> reduce page-table entries and can improve sequential I/O, but may increase internal fragmentation and load unused data. It is not a guaranteed cure for thrashing.</li>
+          <li><b>Global vs local replacement:</b> global replacement may take a frame from any process and can improve overall throughput, but one process can harm another. Local replacement chooses only from the faulting process's frames, giving stronger isolation but less flexibility.</li>
+        </ul>
+      </div>
+
+      <h2 class="sec"><span class="n">3</span> Rapid-Fire Concept Quiz</h2>
       <p class="sec-sub">Ten mixed questions across all five modules. Immediate feedback.</p>
       <div id="examQuiz"></div>
       <div class="card" style="text-align:center">
