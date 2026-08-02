@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computer OS — Interactive Learning Lab</title>
+<style>
+/* ============================================================
+   THEME — built around #FF9A00
+   ============================================================ */
+:root{
+  --primary:#FF9A00;
+  --primary-dark:#E07E00;
+  --primary-darker:#B35F00;
+  --primary-light:#FFB84D;
+  --primary-tint:#FFE7C2;
+  --primary-wash:#FFF6EA;
+  --accent:#2A6F97;      /* cool blue for contrast */
+  --accent-2:#2A9D8F;    /* teal-green = success */
+  --danger:#E5484D;      /* red = fault / error */
+  --violet:#6C5CE7;
+  --ink:#2A2620;
+  --ink-soft:#6B6459;
+  --bg:#FBF7F1;
+  --card:#FFFFFF;
+  --sidebar:#211E1A;
+  --sidebar-hi:#332D25;
+  --line:#EBE2D5;
+  --shadow:0 6px 24px rgba(120,80,0,.10);
+  --shadow-lg:0 14px 40px rgba(120,80,0,.16);
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.6;font-size:16px;
+}
+code,kbd,.mono{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
+
+/* ============================================================ LAYOUT */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:290px;background:var(--sidebar);color:#EDE6DA;position:fixed;top:0;bottom:0;left:0;
+  display:flex;flex-direction:column;z-index:50;transition:transform .3s ease;
+}
+.sidebar-head{padding:22px 22px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.15rem;letter-spacing:.2px}
+.brand .logo{
+  width:38px;height:38px;border-radius:11px;flex:none;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  display:grid;place-items:center;font-size:20px;box-shadow:0 4px 14px rgba(255,154,0,.5)
+}
+.brand small{display:block;font-weight:500;font-size:.72rem;color:#B9AF9E;letter-spacing:.5px}
+.nav{overflow-y:auto;padding:12px 12px 40px;flex:1}
+.nav::-webkit-scrollbar{width:8px}
+.nav::-webkit-scrollbar-thumb{background:#4a4238;border-radius:8px}
+.nav-group{margin-bottom:6px}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:11px;cursor:pointer;
+  color:#D6CDBE;font-weight:600;font-size:.93rem;transition:.15s;border:1px solid transparent;
+}
+.nav-item .ic{width:24px;text-align:center;font-size:1.05rem;flex:none}
+.nav-item:hover{background:var(--sidebar-hi);color:#fff}
+.nav-item.active{
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;
+  box-shadow:0 6px 18px rgba(255,154,0,.35)
+}
+.nav-item .badge{margin-left:auto;font-size:.68rem;background:rgba(255,255,255,.16);padding:2px 8px;border-radius:20px;font-weight:700}
+.nav-item.active .badge{background:rgba(0,0,0,.18)}
+
+.progress-wrap{padding:14px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.progress-wrap .lbl{font-size:.75rem;color:#B9AF9E;display:flex;justify-content:space-between;margin-bottom:7px}
+.progress-track{height:9px;background:#3a332b;border-radius:20px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--primary-light),var(--primary));transition:width .5s;border-radius:20px}
+
+.main{margin-left:290px;flex:1;min-width:0}
+.topbar{
+  position:sticky;top:0;z-index:30;background:rgba(251,247,241,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:12px 30px;display:flex;align-items:center;gap:16px
+}
+.menu-btn{display:none;background:var(--primary);color:#fff;border:none;width:42px;height:42px;border-radius:11px;font-size:20px;cursor:pointer}
+.crumb{font-weight:700;color:var(--ink)}
+.crumb span{color:var(--primary-dark)}
+.topbar .spacer{flex:1}
+.reset-btn{background:transparent;border:1px solid var(--line);color:var(--ink-soft);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:.85rem}
+.reset-btn:hover{border-color:var(--primary);color:var(--primary-dark)}
+
+.content{max-width:1000px;margin:0 auto;padding:34px 30px 120px}
+.module{display:none;animation:fade .4s ease}
+.module.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ============================================================ TYPO / CARDS */
+.hero{
+  background:linear-gradient(135deg,#fff,var(--primary-wash));border:1px solid var(--line);
+  border-radius:22px;padding:34px 34px;box-shadow:var(--shadow);margin-bottom:28px;position:relative;overflow:hidden
+}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,154,0,.22),transparent 70%)}
+.hero .kicker{display:inline-block;background:var(--primary);color:#fff;font-weight:700;font-size:.74rem;letter-spacing:1px;padding:5px 12px;border-radius:20px;text-transform:uppercase}
+.hero h1{font-size:2.05rem;line-height:1.15;margin:14px 0 10px;letter-spacing:-.5px}
+.hero p{color:var(--ink-soft);max-width:640px;font-size:1.02rem}
+.hero .metarow{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px}
+.hero .metarow b{color:var(--primary-dark);font-size:1.5rem;display:block}
+.hero .metarow span{font-size:.8rem;color:var(--ink-soft)}
+
+h2.sec{font-size:1.5rem;margin:38px 0 6px;letter-spacing:-.3px;display:flex;align-items:center;gap:12px}
+h2.sec .n{background:var(--primary);color:#fff;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:1rem;flex:none}
+.sec-sub{color:var(--ink-soft);margin-bottom:16px;font-size:.96rem}
+h3.h3{font-size:1.16rem;margin:24px 0 8px;color:var(--primary-darker)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow);margin:16px 0}
+.card p+p{margin-top:10px}
+.lead{font-size:1.02rem}
+ul.clean{list-style:none;margin:10px 0}
+ul.clean li{padding:6px 0 6px 30px;position:relative}
+ul.clean li::before{content:"▹";position:absolute;left:6px;color:var(--primary);font-weight:800}
+ul.plus li::before{content:"✔";color:var(--accent-2)}
+ul.minus li::before{content:"✕";color:var(--danger)}
+b.key,strong.key{color:var(--primary-darker)}
+.term{color:var(--primary-darker);font-weight:700;border-bottom:2px dotted var(--primary-light);cursor:help}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* callouts */
+.note{border-left:5px solid var(--primary);background:var(--primary-wash);padding:14px 18px;border-radius:0 12px 12px 0;margin:16px 0}
+.note.analogy{border-color:var(--accent-2);background:#EAF7F4}
+.note.warn{border-color:var(--danger);background:#FDECEC}
+.note.exam{border-color:var(--violet);background:#F0EEFC}
+.note .tag{font-weight:800;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px}
+.note.analogy .tag{color:var(--accent-2)}
+.note.warn .tag{color:var(--danger)}
+.note.exam .tag{color:var(--violet)}
+.note .tag2{color:var(--primary-dark)}
+
+/* stat chips */
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.chip{background:var(--primary-wash);border:1px solid var(--primary-tint);color:var(--primary-darker);padding:7px 14px;border-radius:30px;font-weight:600;font-size:.85rem}
+
+/* code block */
+.code{background:#211E1A;color:#F2ECE0;border-radius:12px;padding:16px 18px;overflow-x:auto;font-size:.88rem;margin:12px 0;line-height:1.7}
+.code .c{color:#8b8375}.code .g{color:#FFB84D}.code .p{color:#7fd1c0}.code .r{color:#ff8f8f}
+
+/* comparison table */
+table.cmp{width:100%;border-collapse:collapse;margin:14px 0;font-size:.92rem;overflow:hidden;border-radius:12px;box-shadow:var(--shadow)}
+table.cmp th{background:var(--primary);color:#fff;padding:11px 14px;text-align:left;font-size:.85rem}
+table.cmp td{padding:11px 14px;border-bottom:1px solid var(--line);background:#fff;vertical-align:top}
+table.cmp tr:nth-child(even) td{background:var(--primary-wash)}
+table.cmp td:first-child{font-weight:700;color:var(--primary-darker)}
+
+/* ============================================================ INTERACTIVE WIDGET SHELL */
+.lab{background:linear-gradient(180deg,#fff,var(--primary-wash));border:2px solid var(--primary-tint);border-radius:18px;padding:22px 24px;margin:20px 0;box-shadow:var(--shadow)}
+.lab-head{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--primary-darker);margin-bottom:4px;font-size:1.05rem}
+.lab-head .pill{margin-left:auto;background:var(--primary);color:#fff;font-size:.68rem;padding:3px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+.lab-desc{color:var(--ink-soft);font-size:.9rem;margin-bottom:14px}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:14px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:.76rem;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select{border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.95rem;font-family:inherit;background:#fff;min-width:90px}
+.field input:focus,.field select:focus{outline:none;border-color:var(--primary)}
+.btn{background:var(--primary);color:#fff;border:none;padding:10px 18px;border-radius:11px;font-weight:700;cursor:pointer;font-size:.9rem;transition:.15s;box-shadow:0 4px 12px rgba(255,154,0,.3)}
+.btn:hover{background:var(--primary-dark);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn.ghost{background:#fff;color:var(--primary-darker);border:1.5px solid var(--primary);box-shadow:none}
+.btn.ghost:hover{background:var(--primary-wash)}
+.btn.sm{padding:7px 13px;font-size:.82rem}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+/* page replacement grid */
+.pr-grid{display:inline-flex;gap:4px;margin-top:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px}
+.pr-col{display:flex;flex-direction:column;gap:4px;align-items:center}
+.pr-ref{width:38px;height:34px;display:grid;place-items:center;font-weight:800;border-radius:8px;background:var(--sidebar);color:#fff;font-size:.95rem}
+.pr-cell{width:38px;height:34px;display:grid;place-items:center;border:1.5px solid var(--line);border-radius:8px;background:#fff;font-weight:700;font-size:.95rem;transition:.25s}
+.pr-cell.fill{background:var(--primary-wash);border-color:var(--primary-tint)}
+.pr-cell.new{background:var(--primary);color:#fff;border-color:var(--primary);transform:scale(1.06)}
+.pr-cell.victim{background:var(--danger);color:#fff;border-color:var(--danger)}
+.pr-mark{height:22px;display:grid;place-items:center;font-weight:900;font-size:1rem}
+.pr-mark.fault{color:var(--danger)}
+.pr-mark.hit{color:var(--accent-2)}
+.readout{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px}
+.readout .r{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 16px;min-width:110px}
+.readout .r b{display:block;font-size:1.7rem;color:var(--primary-dark);line-height:1}
+.readout .r span{font-size:.76rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px}
+
+/* memory bar viz */
+.membar{display:flex;height:56px;border-radius:12px;overflow:hidden;border:2px solid var(--line);margin:12px 0;background:#fff}
+.memseg{display:grid;place-items:center;color:#fff;font-weight:700;font-size:.8rem;transition:.4s;position:relative;text-align:center;padding:2px}
+.memseg.free{background:repeating-linear-gradient(45deg,#EFE7DA,#EFE7DA 8px,#E4DACB 8px,#E4DACB 16px);color:var(--ink-soft)}
+.memseg.os{background:var(--sidebar)}
+.memseg.proc{background:linear-gradient(135deg,var(--primary),var(--primary-dark))}
+.memseg.hl{outline:3px solid var(--accent);outline-offset:-3px;z-index:2}
+
+/* pyramid */
+.pyramid{display:flex;flex-direction:column;align-items:center;gap:5px;margin:16px 0}
+.pyr-row{color:#fff;font-weight:700;padding:12px;border-radius:8px;text-align:center;cursor:pointer;transition:.2s;position:relative;display:flex;justify-content:center;gap:8px;align-items:center}
+.pyr-row:hover{transform:scale(1.03);box-shadow:var(--shadow-lg)}
+.pyr-row small{font-weight:500;opacity:.9}
+
+/* clickable architecture */
+.arch{display:flex;flex-direction:column;gap:6px;margin:14px 0}
+.arch-layer{border-radius:12px;padding:14px 18px;cursor:pointer;transition:.2s;border:2px solid transparent;font-weight:700;color:#fff;display:flex;align-items:center;gap:10px}
+.arch-layer small{font-weight:500;opacity:.92;font-size:.8rem}
+.arch-layer:hover{transform:translateX(4px)}
+.arch-layer.sel{border-color:var(--sidebar);box-shadow:var(--shadow-lg)}
+.arch-detail{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:6px;min-height:60px}
+
+/* flip cards */
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin:14px 0}
+.flip{perspective:1000px;height:150px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip.on .flip-inner{transform:rotateY(180deg)}
+.flip-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:16px;display:flex;flex-direction:column;justify-content:center;text-align:center;box-shadow:var(--shadow)}
+.flip-front{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-weight:800;font-size:1.05rem}
+.flip-front small{font-weight:500;opacity:.85;margin-top:6px;font-size:.75rem}
+.flip-back{background:#fff;border:1.5px solid var(--primary-tint);transform:rotateY(180deg);font-size:.86rem;color:var(--ink);align-items:flex-start;text-align:left;overflow-y:auto}
+
+/* quiz */
+.quiz{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:20px 22px;margin:18px 0;box-shadow:var(--shadow)}
+.quiz .q{font-weight:700;margin-bottom:6px;display:flex;gap:8px}
+.quiz .q .qn{background:var(--violet);color:#fff;border-radius:8px;padding:0 9px;font-size:.85rem;height:24px;display:grid;place-items:center;flex:none}
+.opt{border:1.5px solid var(--line);border-radius:11px;padding:11px 15px;margin:8px 0;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:10px}
+.opt:hover{border-color:var(--primary);background:var(--primary-wash)}
+.opt .mk{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:.8rem;font-weight:800}
+.opt.correct{border-color:var(--accent-2);background:#EAF7F4}
+.opt.correct .mk{background:var(--accent-2);border-color:var(--accent-2);color:#fff}
+.opt.wrong{border-color:var(--danger);background:#FDECEC}
+.opt.wrong .mk{background:var(--danger);border-color:var(--danger);color:#fff}
+.opt.lock{pointer-events:none}
+.explain{display:none;margin-top:10px;padding:12px 14px;border-radius:10px;background:var(--primary-wash);border-left:4px solid var(--primary);font-size:.9rem}
+.explain.show{display:block;animation:fade .3s}
+
+/* terminal sim */
+.term-sim{background:#1a1712;border-radius:14px;overflow:hidden;box-shadow:var(--shadow-lg);margin:14px 0}
+.term-bar{background:#2b261f;padding:9px 14px;display:flex;gap:7px;align-items:center}
+.term-bar i{width:12px;height:12px;border-radius:50%;display:block}
+.term-bar .t1{background:#ff5f57}.term-bar .t2{background:#febc2e}.term-bar .t3{background:#28c840}
+.term-bar span{color:#9b9284;font-size:.78rem;margin-left:10px;font-family:monospace}
+.term-body{padding:16px;font-family:monospace;font-size:.86rem;color:#e8e0d2;min-height:150px;max-height:280px;overflow-y:auto}
+.term-body .prompt{color:var(--primary-light)}
+.term-body .cmd{color:#fff}
+.term-body .out{color:#b9b0a1;white-space:pre-wrap}
+.term-input{display:flex;align-items:center;gap:8px;padding:0 16px 14px;font-family:monospace}
+.term-input .prompt{color:var(--primary-light)}
+.term-input input{flex:1;background:transparent;border:none;color:#fff;font-family:monospace;font-size:.86rem;outline:none}
+
+/* stepper controls row */
+.steprow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.stepinfo{color:var(--ink-soft);font-size:.86rem}
+
+/* toast */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(30px);background:var(--sidebar);color:#fff;padding:13px 22px;border-radius:12px;box-shadow:var(--shadow-lg);opacity:0;transition:.3s;z-index:100;font-weight:600}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* diagram helpers */
+.flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;margin:14px 0}
+.flow .box{background:#fff;border:2px solid var(--primary);border-radius:12px;padding:10px 14px;font-weight:700;font-size:.85rem;text-align:center;color:var(--primary-darker);box-shadow:var(--shadow)}
+.flow .box.alt{border-color:var(--accent);color:var(--accent)}
+.flow .box.dark{background:var(--sidebar);color:#fff;border-color:var(--sidebar)}
+.flow .arr{color:var(--primary);font-size:1.4rem;font-weight:900}
+
+.section-done{display:inline-flex;align-items:center;gap:8px;margin-top:20px}
+.done-btn{background:#fff;border:2px solid var(--accent-2);color:var(--accent-2);padding:9px 18px;border-radius:11px;font-weight:700;cursor:pointer;transition:.15s}
+.done-btn.done{background:var(--accent-2);color:#fff}
+.done-btn:hover{transform:translateY(-1px)}
+
+.mini-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;color:var(--ink-soft);margin:8px 0}
+.mini-legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:13px;height:13px;border-radius:4px;display:inline-block}
+
+.foot{text-align:center;color:var(--ink-soft);font-size:.82rem;padding:30px;border-top:1px solid var(--line);margin-top:40px}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .menu-btn{display:grid;place-items:center}
+  .hero h1{font-size:1.6rem}
+}
+.backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}
+.backdrop.show{display:block}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">
+        <div class="logo">🖥️</div>
+        <div>Computer OS Lab
+          <small>Interactive Study Companion</small>
+        </div>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="nav-item active" data-m="home"><span class="ic">🏠</span> Start Here</div>
+      <div class="nav-item" data-m="hw"><span class="ic">⚡</span> 1 · Hardware Support <span class="badge">M1</span></div>
+      <div class="nav-item" data-m="win"><span class="ic">🪟</span> 2 · Windows OS <span class="badge">M2</span></div>
+      <div class="nav-item" data-m="linux"><span class="ic">🐧</span> 3 · Linux & Bash <span class="badge">M3</span></div>
+      <div class="nav-item" data-m="vm"><span class="ic">🧠</span> 4 · Virtual Memory <span class="badge">M4</span></div>
+      <div class="nav-item" data-m="mm"><span class="ic">📦</span> 5 · Memory Mgmt <span class="badge">M5</span></div>
+      <div class="nav-item" data-m="exam"><span class="ic">🎯</span> Exam Drill Zone</div>
+    </nav>
+    <div class="progress-wrap">
+      <div class="lbl"><span>Your progress</span><span id="pctText">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="pfill"></div></div>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- ==================== MAIN ==================== -->
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-btn" id="menuBtn">☰</button>
+      <div class="crumb">Computer OS · <span id="crumb">Start Here</span></div>
+      <div class="spacer"></div>
+      <button class="reset-btn" id="resetBtn">↺ Reset progress</button>
+    </div>
+    <div class="content">
+
+    <!-- ============================================================ HOME -->
+    <section class="module active" id="m-home">
+      <div class="hero">
+        <span class="kicker">MSc · Computer Operating Systems</span>
+        <h1>Understand it. See it move. Never forget it.</h1>
+        <p>This lab turns your five lecture decks into <b>animated demos, hands-on simulators and instant-feedback quizzes</b>. Every concept from the slides is here — explained in plain English, tied to a real-world story, and made clickable so it sticks.</p>
+        <div class="metarow">
+          <div><b>5</b><span>Modules</span></div>
+          <div><b>12+</b><span>Interactive simulators</span></div>
+          <div><b>40+</b><span>Quiz questions</span></div>
+          <div><b>100%</b><span>Slide coverage</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">🧭 How to use this lab (read this first)</h3>
+        <ul class="clean">
+          <li><b>Go module by module</b> using the left menu — they follow your slide order exactly.</li>
+          <li>Each idea has three parts: <b class="key">the concept</b> → <b class="key">a real-world analogy</b> → <b class="key">a thing you can play with</b>.</li>
+          <li>Anything in an <span class="chip" style="padding:2px 10px">orange lab box</span> is <b>interactive</b> — click buttons, drag sliders, run the simulator. Doing beats reading.</li>
+          <li>Hit <b>"Mark section understood"</b> at the end of each section — your progress bar (bottom-left) fills up and is saved in your browser.</li>
+          <li>Finish with the <b>🎯 Exam Drill Zone</b>, built from your actual tutorial question sheets.</li>
+        </ul>
+      </div>
+
+      <div class="grid3">
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem">⚡</div><b>See the machine</b>
+          <p style="font-size:.88rem;color:var(--ink-soft)">Watch interrupts fire, modes switch and DMA move data in animated diagrams.</p>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem">🧪</div><b>Run the algorithms</b>
+          <p style="font-size:.88rem;color:var(--ink-soft)">Step through FIFO / LRU / Optimal, address translation and fit-algorithms yourself.</p>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem">🧠</div><b>Lock it in</b>
+          <p style="font-size:.88rem;color:var(--ink-soft)">Flip-cards, analogies and quizzes turn understanding into memory.</p>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="tag2" style="font-weight:800">START →</span> Click <b>“1 · Hardware Support”</b> in the menu. Take it slowly; every section builds on the one before it.
+      </div>
+    </section>
+
+    <!-- ============================================================ MODULE 1: HARDWARE -->
+    <section class="module" id="m-hw">
+      <div class="hero">
+        <span class="kicker">Module 1</span>
+        <h1>⚡ Low-Level Hardware Support for the OS</h1>
+        <p>Before an OS can manage anything, the <b>hardware</b> must give it special powers: a way to grab the CPU's attention (interrupts), a way to lock users out of dangerous instructions (dual mode), and ways to protect memory, time, and I/O. This module is the foundation for everything else.</p>
+      </div>
+
+      <!-- 1.1 Interrupts -->
+      <h2 class="sec"><span class="n">1</span> Interrupt-Driven Operation</h2>
+      <p class="sec-sub">How devices and the CPU work at the same time without the CPU wasting its life waiting.</p>
+
+      <div class="card">
+        <p class="lead">The CPU and I/O devices (disk, keyboard, network card…) can <b class="key">run concurrently</b>. The problem: how does a slow device tell the fast CPU “I'm done!” without the CPU standing around checking constantly?</p>
+        <p>The answer is the <span class="term">interrupt</span>: <em>a signal that stops the currently executing program because some other code urgently needs to run to deal with a request for service.</em></p>
+        <ul class="clean">
+          <li>Each I/O device type has a <b class="key">device controller</b> that controls that device.</li>
+          <li>Each controller has a <b class="key">local buffer</b> (small on-board memory).</li>
+          <li>Real I/O happens between the <b>device ⇄ its local buffer</b>. The CPU then moves data between <b>main memory ⇄ local buffer</b>.</li>
+          <li>When the controller finishes, it <b class="key">raises an interrupt</b> to tell the CPU.</li>
+        </ul>
+      </div>
+
+      <div class="note analogy">
+        <span class="tag">🍽️ Real-world analogy — The restaurant kitchen</span>
+        You're a chef (the <b>CPU</b>). You put bread in the toaster (a <b>device</b>) and <b>walk away to chop vegetables</b> — you don't stare at the toaster. When toast is ready, the toaster <b>“dings”</b> (the <b>interrupt</b>). You pause chopping, grab the toast (<b>handle the interrupt</b>), then go back to exactly where you left off in chopping. That “ding” is why you can cook ten things at once instead of babysitting one.
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">⚡ Interrupt Timeline Simulator <span class="pill">Interactive</span></div>
+        <div class="lab-desc">Press <b>Start I/O</b>. Watch the CPU keep working on the user program while the device works in parallel — then get interrupted when the device finishes.</div>
+        <div id="intTrack" style="display:flex;flex-direction:column;gap:10px">
+          <div>
+            <div style="font-size:.8rem;font-weight:700;color:var(--ink-soft);margin-bottom:4px">CPU</div>
+            <div style="height:34px;background:#f0e8db;border-radius:9px;position:relative;overflow:hidden">
+              <div id="cpuBar" style="position:absolute;inset:0;display:flex;align-items:center;padding-left:10px;font-weight:700;font-size:.82rem;color:var(--primary-darker)">Running user program…</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:.8rem;font-weight:700;color:var(--ink-soft);margin-bottom:4px">Disk Controller</div>
+            <div style="height:34px;background:#f0e8db;border-radius:9px;position:relative;overflow:hidden">
+              <div id="devBar" style="position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--accent),#3a8fbf);border-radius:9px;transition:width .1s"></div>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;padding-left:10px;font-weight:700;font-size:.82rem;color:#fff;mix-blend-mode:difference" id="devLabel"></div>
+            </div>
+          </div>
+        </div>
+        <div class="steprow">
+          <button class="btn" id="intStart">▶ Start I/O</button>
+          <span class="stepinfo" id="intStatus">Idle. The CPU is free to run other code while the disk fetches data.</span>
+        </div>
+      </div>
+
+      <!-- 1.2 interrupt handling -->
+      <h3 class="h3">How an interrupt is handled — step by step</h3>
+      <div class="card">
+        <div class="flow">
+          <div class="box dark">1. Interrupt fires</div><span class="arr">→</span>
+          <div class="box">2. OS saves state<br><small>PC, Stack Pointer, registers</small></div><span class="arr">→</span>
+          <div class="box">3. Identify type<br><small>Polling or vector table</small></div><span class="arr">→</span>
+          <div class="box alt">4. Run ISR</div><span class="arr">→</span>
+          <div class="box dark">5. Restore state / call scheduler</div>
+        </div>
+        <p>To identify <b>which</b> interrupt happened, the OS uses one of two methods:</p>
+        <table class="cmp">
+          <tr><th>Method</th><th>How it works</th></tr>
+          <tr><td>Polling</td><td>OS <b>checks each device controller's status register</b> one by one to see if it needs service. Simple, but wastes time asking everyone.</td></tr>
+          <tr><td>Interrupt vectors</td><td>Uses a <b>table of addresses (“vectors”)</b> of Interrupt Service Routines. The interrupt passes a <b>number</b> = an index into the table → jumps straight to the right ISR. Fast.</td></tr>
+        </table>
+        <ul class="clean">
+          <li>The <span class="term">ISR (Interrupt Service Routine)</span> is part of the OS and carries out the right action for that interrupt type.</li>
+          <li>When the ISR finishes, the OS either <b>restores the interrupted program's saved registers</b>, or <b>calls the scheduler</b> to decide if a different program should run next.</li>
+          <li>New interrupts are <b class="key">disabled while one is being processed</b> — this prevents a “lost interrupt”.</li>
+          <li>But interrupts have <b class="key">priorities</b>: a higher-priority interrupt <em>can</em> interrupt a lower-priority one.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">Two families of interrupt</h3>
+        <div class="grid2">
+          <div class="note" style="margin:0">
+            <span class="tag2" style="font-weight:800">🔌 Hardware interrupt</span>
+            Comes from <b>outside the running program</b>:
+            <ul class="clean"><li>An I/O device signalling completion</li><li>A hardware fault (e.g. <b>“power low”</b> on a laptop)</li></ul>
+          </div>
+          <div class="note exam" style="margin:0">
+            <span class="tag">💻 Software interrupt (a “trap”)</span>
+            Generated <b>by the running program itself</b>:
+            <ul class="clean"><li>A program deliberately asking the OS for a service (this is how <b>system calls</b> work!)</li><li>A software error, e.g. <b>divide by zero</b></li></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <div class="q"><span class="qn">Q</span> A program executes <code>x = 5 / 0</code>. What kind of interrupt is generated?</div>
+        <div class="opt" data-c="0"><span class="mk"></span> A hardware interrupt from the CPU's cooling fan</div>
+        <div class="opt" data-c="1"><span class="mk"></span> A trap (software interrupt) caused by a software error</div>
+        <div class="opt" data-c="0"><span class="mk"></span> No interrupt — the program just returns 0</div>
+        <div class="explain">✅ <b>A trap.</b> A software error like divide-by-zero is a software-generated interrupt (trap). The CPU traps into the OS, which decides how to deal with the faulting program.</div>
+      </div>
+
+      <!-- 1.3 Dual mode -->
+      <h2 class="sec"><span class="n">2</span> CPU Dual-Mode Operation</h2>
+      <p class="sec-sub">Stopping one buggy or malicious program from wrecking everyone else's.</p>
+      <div class="card">
+        <p class="lead">Many user programs run together (browser, Word, music player…) and <b>share</b> the CPU, memory and devices. A normal program <b>must not</b> be allowed to run instructions that could corrupt other programs. So the CPU has (at least) <b class="key">two modes</b>:</p>
+        <table class="cmp">
+          <tr><th>Mode</th><th>Who runs here</th><th>Powers</th></tr>
+          <tr><td>User mode <span class="mono">(bit = 1)</span></td><td>User programs</td><td>Only a <b>subset</b> of the instruction set is allowed</td></tr>
+          <tr><td>Supervisor mode <span class="mono">(bit = 0)</span><br><small>a.k.a. monitor / system / kernel mode</small></td><td>The operating system</td><td>Can execute <b>all</b> instructions, including privileged ones</td></tr>
+        </table>
+        <ul class="clean">
+          <li>A <b class="key">mode bit</b> in hardware records the current mode (0 = supervisor, 1 = user).</li>
+          <li><span class="term">Privileged instructions</span> can only run in supervisor mode (e.g. “kill a running program”, load base/limit registers, do I/O, load the timer). <b>Changing the mode bit is itself privileged.</b></li>
+          <li><b>How the switch happens:</b> when an interrupt/fault occurs → hardware switches to <b>supervisor</b> mode. When the OS restarts a user program → switches back to <b>user</b> mode.</li>
+          <li><b>Key guarantee:</b> the CPU only enters supervisor mode <em>through</em> an interrupt, and the interrupt hands control to an ISR which <b>is part of the OS</b>. So <b class="key">only the OS ever runs in supervisor mode</b> — a user program can never seize the machine in supervisor mode.</li>
+        </ul>
+      </div>
+
+      <div class="note analogy">
+        <span class="tag">🏨 Real-world analogy — The hotel keycard</span>
+        Guests get a <b>keycard (user mode)</b> that opens only their own room. Staff have a <b>master key (supervisor mode)</b> that opens everything. You can't upgrade your own card to a master key — only the front desk (the OS, via a controlled request) can. If a guest tries a door that isn't theirs, the lock refuses (a protection fault). That's dual mode: normal users are deliberately limited so one guest can't ransack another's room.
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">🔐 Dual-Mode Instruction Checker <span class="pill">Interactive</span></div>
+        <div class="lab-desc">Flip the CPU mode, then try to execute instructions. See which ones the hardware allows.</div>
+        <div class="controls">
+          <div class="field"><label>CPU Mode bit</label>
+            <button class="btn ghost" id="modeToggle">User mode (1)</button>
+          </div>
+        </div>
+        <div class="flip-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))" id="instrGrid"></div>
+        <div id="modeResult" style="margin-top:6px"></div>
+      </div>
+
+      <div class="note warn">
+        <span class="tag">⚠️ Why memory protection becomes necessary</span>
+        If a user program could write its own code into the <b>interrupt vector</b>, then when an interrupt fires the CPU would jump to <em>the user's code</em> while in <b>supervisor mode</b> — game over. That's exactly why the system also needs <b>memory protection</b> (next section).
+      </div>
+
+      <!-- 1.4 memory protection -->
+      <h2 class="sec"><span class="n">3</span> Memory Protection — Base & Limit Registers</h2>
+      <p class="sec-sub">Fencing off each program so it can only touch its own memory.</p>
+      <div class="card">
+        <p class="lead">A simple hardware mechanism uses two registers:</p>
+        <ul class="clean">
+          <li><b class="key">Base register</b> — holds the <b>smallest legal physical address</b> the program may touch.</li>
+          <li><b class="key">Limit register</b> — holds the <b>size</b> (range) of the allowed region.</li>
+        </ul>
+        <p>Every address a program generates is checked: it's legal only if <span class="mono">base ≤ address &lt; base + limit</span>. Any access outside the range triggers an <b>error interrupt</b> into the OS. Loading the base and limit registers is a <b class="key">privileged instruction</b>. In supervisor mode the OS bypasses this and can touch all memory.</p>
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">🧱 Base/Limit Access Guard <span class="pill">Interactive</span></div>
+        <div class="lab-desc">The green band is the program's legal region. Enter an address the program wants to access and see whether the hardware allows it or traps to the OS.</div>
+        <div class="controls">
+          <div class="field"><label>Base</label><input type="number" id="blBase" value="300000" step="1000"></div>
+          <div class="field"><label>Limit (size)</label><input type="number" id="blLimit" value="120000" step="1000"></div>
+          <div class="field"><label>Access address</label><input type="number" id="blAddr" value="420000" step="1000"></div>
+          <button class="btn" id="blCheck">Check access</button>
+        </div>
+        <div style="position:relative;height:70px;background:#f0e8db;border-radius:12px;margin-top:6px;overflow:hidden" id="blCanvas">
+          <div id="blBand" style="position:absolute;top:0;bottom:0;background:linear-gradient(180deg,rgba(42,157,143,.25),rgba(42,157,143,.4));border-left:3px solid var(--accent-2);border-right:3px solid var(--accent-2)"></div>
+          <div id="blPtr" style="position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--danger)"></div>
+        </div>
+        <div class="mini-legend"><span><span class="dot" style="background:var(--accent-2)"></span> Legal region (base → base+limit)</span><span><span class="dot" style="background:var(--danger)"></span> Requested address</span></div>
+        <div id="blResult"></div>
+      </div>
+
+      <!-- 1.5 CPU protection / timer -->
+      <h2 class="sec"><span class="n">4</span> CPU Protection — The Timer</h2>
+      <div class="card">
+        <p class="lead">What if a user program enters an <b>infinite loop</b> and never gives the CPU back? The OS needs a way to regain control. Enter the <span class="term">timer</span>:</p>
+        <ul class="clean">
+          <li>The timer <b>interrupts the computer after a set time elapses</b>, guaranteeing the OS gets control back.</li>
+          <li>It is <b>decremented every clock tick</b>; when it hits <b>0</b>, an interrupt occurs.</li>
+          <li>Used to implement <b class="key">time-sharing</b> (slicing CPU time between programs) and to <b>compute the current time</b>.</li>
+          <li>Loading the timer is — you guessed it — a <b class="key">privileged instruction</b>.</li>
+        </ul>
+      </div>
+      <div class="note analogy">
+        <span class="tag">⏲️ Real-world analogy — The debate moderator's buzzer</span>
+        Each speaker (program) gets 2 minutes. A <b>buzzer (timer)</b> goes off when time's up, and the <b>moderator (OS)</b> cuts the mic and moves to the next speaker — even if the current one wanted to talk forever. Without the buzzer, one long-winded speaker (an infinite loop) would hijack the whole event.
+      </div>
+
+      <!-- 1.6 I/O structure -->
+      <h2 class="sec"><span class="n">5</span> Synchronous vs Asynchronous I/O</h2>
+      <div class="grid2">
+        <div class="card">
+          <h3 class="h3" style="margin-top:0">🔒 Synchronous I/O</h3>
+          <p>After I/O starts, control returns to the program <b>only when the I/O is fully complete</b>.</p>
+          <ul class="clean"><li>CPU <b>waits</b> — either goes idle until the next interrupt, or sits in a <b>busy loop</b> polling the device.</li><li><b>At most one</b> I/O request outstanding at a time. No overlap.</li></ul>
+        </div>
+        <div class="card">
+          <h3 class="h3" style="margin-top:0">⚡ Asynchronous I/O</h3>
+          <p>After I/O starts, control returns to the program <b>immediately</b>, without waiting.</p>
+          <ul class="clean"><li>Needs a <b class="key">device-status table</b> — one entry per device with its type, address and state.</li><li><b>Multiple requests</b> can be queued (linked list) per device.</li><li>OS indexes into the table to check each device's status.</li></ul>
+        </div>
+      </div>
+      <div class="note analogy">
+        <span class="tag">☕ Real-world analogy — Ordering coffee</span>
+        <b>Synchronous:</b> you order, then <b>stand at the counter staring</b> until your latte is done — you can't do anything else. <b>Asynchronous:</b> you order, they give you a <b>buzzer</b>, you go sit down and read (do other work); the buzzer (interrupt) calls you back when it's ready. Async lets the barista handle <b>many orders at once</b>.
+      </div>
+
+      <!-- 1.7 I/O protection + system calls -->
+      <h2 class="sec"><span class="n">6</span> I/O Protection & System Calls</h2>
+      <div class="card">
+        <p class="lead">All I/O instructions are <b class="key">privileged</b> — so a user program can't directly grab a device and mess with another program's data. But then… <b>how does a user program do I/O at all?</b></p>
+        <p>Through a <span class="term">system call</span>: a request for a service from the OS kernel (create a process, read the disk, open a file…). It's the <b>interface between a process and the OS</b>.</p>
+        <h3 class="h3">How a system call actually works</h3>
+        <div class="flow">
+          <div class="box">Program issues a <b>trap</b> (software interrupt)</div><span class="arr">→</span>
+          <div class="box alt">Vector selects the ISR</div><span class="arr">→</span>
+          <div class="box dark">Mode bit → supervisor; ISR runs</div><span class="arr">→</span>
+          <div class="box">OS verifies params, does the work</div><span class="arr">→</span>
+          <div class="box">Returns to instruction after the call</div>
+        </div>
+        <p>The program passes information about the exact service it wants via <b>parameters</b>. The OS verifies those parameters are correct and legal, executes the request, and returns control.</p>
+        <h3 class="h3">Passing data to the OS — two schemes</h3>
+        <div class="grid2">
+          <div class="chip">📨 Message passing — hand the OS a message/block of parameters</div>
+          <div class="chip">🧠 Shared memory — put params in a memory region both can read</div>
+        </div>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <div class="q"><span class="qn">Q</span> Why are all I/O instructions made privileged?</div>
+        <div class="opt" data-c="0"><span class="mk"></span> To make programs run faster</div>
+        <div class="opt" data-c="1"><span class="mk"></span> To stop one user program from interfering with another program's I/O data</div>
+        <div class="opt" data-c="0"><span class="mk"></span> Because I/O devices are always broken</div>
+        <div class="explain">✅ Privileged I/O prevents one program reading/writing another's data. Programs must instead ask the OS via a <b>system call</b>, which checks the request is legal first.</div>
+      </div>
+
+      <!-- 1.8 DMA -->
+      <h2 class="sec"><span class="n">7</span> Direct Memory Access (DMA)</h2>
+      <div class="card">
+        <p class="lead"><span class="term">DMA</span> lets an I/O controller move blocks of data <b>directly to/from main memory without bothering the CPU</b>.</p>
+        <ul class="clean">
+          <li>Used for <b>high-speed devices</b> that transmit near memory speed.</li>
+          <li>The controller transfers whole <b>blocks</b> straight to memory using <b class="key">cycle stealing</b> (borrowing memory-bus cycles).</li>
+          <li>Only <b class="key">one interrupt per block</b> — instead of one interrupt <b>per byte</b>. Huge CPU saving.</li>
+        </ul>
+      </div>
+      <div class="note analogy">
+        <span class="tag">🚚 Real-world analogy — Bulk delivery vs one parcel at a time</span>
+        Without DMA, the CPU is a manager who <b>personally carries every single parcel</b> from the loading dock (device) to the warehouse (memory) — one interrupt per byte. With DMA, you hire a <b>delivery truck (DMA controller)</b> that hauls a whole pallet (block) directly into the warehouse and only <b>rings the bell once</b> when the entire pallet is delivered. The manager is free to do real work the whole time.
+      </div>
+
+      <!-- 1.9 memory hierarchy -->
+      <h2 class="sec"><span class="n">8</span> Memory Structure, Hierarchy & Caching</h2>
+      <div class="card">
+        <div class="grid2">
+          <div class="note" style="margin:0"><span class="tag2" style="font-weight:800">Main memory (RAM)</span> The only large area the CPU can access <b>directly</b>. It is <b>volatile</b> (lost on power off) and not big enough to hold everything.</div>
+          <div class="note" style="margin:0"><span class="tag2" style="font-weight:800">Secondary memory</span> An <b>extension</b> of main memory — large, <b>non-volatile</b> storage: HDD, SSD, CD/DVD, USB.</div>
+        </div>
+        <p style="margin-top:12px">Storage is organised in a <b class="key">hierarchy</b>: as you go <b>up</b>, you get more <b>speed</b> but higher <b>cost per byte</b>, smaller size, and more volatility.</p>
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">🔺 Memory Hierarchy Explorer <span class="pill">Interactive</span></div>
+        <div class="lab-desc">Click any level to see its trade-offs. Notice the pattern: faster = smaller, costlier, more volatile.</div>
+        <div class="pyramid" id="pyramid"></div>
+        <div class="arch-detail" id="pyrDetail">👆 Click a level of the pyramid.</div>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">The Caching Principle</h3>
+        <p><span class="term">Caching</span> = keeping a <b>copy</b> of some information from a slower medium on a <b>faster</b> one. The cache holds the info <b>currently being used</b>. In fact, <b>main memory can be seen as a fast cache for secondary storage</b>.</p>
+        <div class="note warn"><span class="tag">The core challenge of caching</span> You must maintain a <b>mapping</b> between the copy and the original, and keep them <b>consistent</b> (if you change the copy, the original must eventually match). Example: a <b>disk cache</b> (e.g. 64&nbsp;MB) sits between the slow disk and the faster microprocessor, holding recently used clusters.</p></div>
+      </div>
+
+      <div class="section-done"><button class="done-btn" data-done="hw">✓ Mark Module 1 understood</button></div>
+    </section>
+
+    <!-- ============================================================ MODULE 2: WINDOWS -->
+    <section class="module" id="m-win">
+      <div class="hero">
+        <span class="kicker">Module 2</span>
+        <h1>🪟 Overview of Windows Operating Systems</h1>
+        <p>Where Windows came from, what its designers were trying to achieve, and how it's built inside — from the hardware-hugging bottom layer up to the programs you click on.</p>
+      </div>
+
+      <!-- 2.1 evolution -->
+      <h2 class="sec"><span class="n">1</span> The Evolution of Windows</h2>
+      <div class="card">
+        <p class="lead">Windows split early into <b>two separate families</b> with <b>completely separate code</b> — expensive to maintain — until Windows 2000 began merging them.</p>
+        <div class="grid2">
+          <div class="note" style="margin:0"><span class="tag2" style="font-weight:800">🏠 Domestic / consumer line</span>
+            <b>Windows 95, 98, ME</b> — still built on legacy <b>MS-DOS</b> code (DOS handled things like the file system), so old code ran slower and these were often <b>unstable</b>.</div>
+          <div class="note" style="margin:0"><span class="tag2" style="font-weight:800">🏢 Corporate / business line</span>
+            <b>Windows NT 3.1, 3.51, 4.0</b> — “New Technology”, written <b>from scratch</b> in newer 32-bit code (a joint venture with IBM, similar to OS/2). Emphasis on <b>security & reliability</b> over UI polish and gaming.</div>
+        </div>
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">🕰️ Windows Timeline <span class="pill">Interactive</span></div>
+        <div class="lab-desc">Click a version to see what made it notable. Watch the two families merge into one modern line.</div>
+        <div id="winTimeline" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px"></div>
+        <div class="arch-detail" id="winDetail" style="margin-top:10px">👆 Click a Windows version above.</div>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">Early versions & the DOS front-end</h3>
+        <p>Windows <b>1.0 / 2.0 / 3.0 / 3.1</b> were essentially a <b>GUI front-end</b> on top of the command-line MS-DOS. <b>Windows 95</b> added 32-bit apps, <b>Plug &amp; Play</b>, virtual memory, multitasking and long filenames — but was still DOS-based underneath.</p>
+        <p><b>2000 → XP → Vista → 7 → 8 → 10:</b> Windows 2000 re-branded NT 5 for both markets; XP was essentially NT 5.1; Vista was NT 6; Windows 7 rewrote the Vista kernel for speed; Windows 8 brought a new touch-friendly interface for desktop <b>and</b> tablets; Windows 10 added the <b>Cortana</b> assistant (like Siri/Google Assistant/Alexa) and <b>HoloLens</b> AR.</p>
+      </div>
+
+      <!-- 2.2 versions/builds -->
+      <h2 class="sec"><span class="n">2</span> Versions, Builds & Service Packs</h2>
+      <div class="card">
+        <p class="lead">Example string: <code>Windows 7 — Version 6.1 (Build 7601: Service Pack 1)</code></p>
+        <table class="cmp">
+          <tr><th>Term</th><th>What it actually means</th></tr>
+          <tr><td>Version number</td><td>The point in the <b>evolution from Windows NT</b> (e.g. Windows 7 is internally NT 6.1).</td></tr>
+          <tr><td>Build number</td><td><b>How many times the software components have been compiled together</b> to produce a complete running OS.</td></tr>
+          <tr><td>Service Pack (SP)</td><td>A <b>bundle of updates and bug fixes (patches)</b> packaged for convenience. Windows XP had 3 service packs.</td></tr>
+        </table>
+        <p>Two PCs can have <b>different builds/service packs</b> but the <b>same version number</b> (e.g. both “NT 10”).</p>
+      </div>
+
+      <!-- 2.3 design goals -->
+      <h2 class="sec"><span class="n">3</span> The 8 Original Design Goals of Windows NT</h2>
+      <p class="sec-sub">These are highly examinable — the flip-cards below help you memorise all eight.</p>
+      <div class="flip-grid" id="ntGoals"></div>
+      <div class="note exam"><span class="tag">🎯 Memory hook</span> Remember them as: <b>“Every Person Requires Careful Planning, Managing System Difficulties”</b> → <b>E</b>xtensibility, <b>P</b>ortability, <b>R</b>eliability, <b>C</b>ompatibility, <b>P</b>erformance, <b>M</b>ultiprocessing/scalability, <b>D</b>istributed computing, <b>S</b>ecurity.</div>
+
+      <!-- 2.4 OS models + architecture -->
+      <h2 class="sec"><span class="n">4</span> Windows NT Internal Architecture</h2>
+      <div class="card">
+        <p class="lead">Reminder — three classic OS models: <b>Monolithic</b>, <b>Layered</b>, and <b>Client/Server</b>. Windows NT uses a <b class="key">mixed design</b>: predominantly <b>layered/modular</b>, plus <b>client/server</b> on top.</p>
+        <ul class="clean">
+          <li><b>Layered portion:</b> Hardware Abstraction Layer (HAL) → Device drivers & Kernel → NT Executive.</li>
+          <li><b>Client/server portion:</b> the subsystems and Windows services that user programs call.</li>
+          <li>Core components follow <b>Object-Oriented design principles</b> — one module never touches another's data directly, only through a <b>defined interface</b>. (Interesting twist: most of Windows is written in <b>C</b>, not C++, because C++ was barely invented when NT started — so C is used to <em>mimic</em> OO structure.)</li>
+        </ul>
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">🏗️ Click-Through Windows Architecture <span class="pill">Interactive</span></div>
+        <div class="lab-desc">Windows is a stack. Click each layer from the <b>user programs at the top</b> down to the <b>hardware at the bottom</b> to learn its job.</div>
+        <div class="arch" id="winArch"></div>
+        <div class="arch-detail" id="winArchDetail">👆 Click any layer to see what it does.</div>
+      </div>
+
+      <!-- 2.5 NT executive components -->
+      <h2 class="sec"><span class="n">5</span> Inside the NT Executive</h2>
+      <div class="card">
+        <p class="lead">The <b>NT Executive</b> is hardware-independent and organised as a set of peer modules that talk through defined interfaces. It exposes OS functions to applications via <code>Ntdll.dll</code>. Here are its components — flip each card to learn its one-line job.</p>
+      </div>
+      <div class="flip-grid" id="ntExec"></div>
+
+      <div class="card">
+        <h3 class="h3">The bottom & top of the stack</h3>
+        <ul class="clean">
+          <li><b class="key">HAL (Hardware Abstraction Layer):</b> low-level interface that <b>hides hardware-specific details</b>, giving other OS parts a common way to access hardware. The right HAL is chosen at install time.</li>
+          <li><b class="key">Device drivers:</b> software controlling I/O devices, file systems (NTFS, Ext2) and network access (TCP/IP). In Windows they don't touch hardware directly — they call the <b>HAL</b>.</li>
+          <li><b class="key">Kernel (Ntoskrnl.exe):</b> gives other components a common set of processor services regardless of CPU architecture. Handles <b>thread scheduling, synchronisation, interrupt/exception handling, context switching</b>, and manages kernel objects.</li>
+          <li><b class="key">Subsystems & services (user mode):</b> environmental subsystems let programs written for other OSes run on Windows; support processes provide logon, spooling, etc. — organised client/server.</li>
+          <li><b class="key">NTDLL:</b> a system interface library that translates subsystem API requests into <b>system calls</b> to NT Executive modules. <code>.dll</code> = <b>Dynamic Linked Library</b> — reusable code modules with <b>no <code>main()</code></b> of their own.</li>
+        </ul>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <div class="q"><span class="qn">Q</span> A component needs to talk to a brand-new type of graphics card. In Windows NT's design, it accesses the hardware through…</div>
+        <div class="opt" data-c="1"><span class="mk"></span> The Hardware Abstraction Layer (HAL)</div>
+        <div class="opt" data-c="0"><span class="mk"></span> Directly poking the hardware ports itself</div>
+        <div class="opt" data-c="0"><span class="mk"></span> The Configuration Manager's Registry</div>
+        <div class="explain">✅ The <b>HAL</b> hides hardware specifics behind a common interface — this is what makes Windows <b>portable</b> to different hardware. Drivers and internal components go through the HAL rather than touching hardware directly.</div>
+      </div>
+
+      <div class="section-done"><button class="done-btn" data-done="win">✓ Mark Module 2 understood</button></div>
+    </section>
+
+    <!-- ============================================================ MODULE 3: LINUX & BASH -->
+    <section class="module" id="m-linux">
+      <div class="hero">
+        <span class="kicker">Module 3</span>
+        <h1>🐧 Linux Shells & Bash Scripting</h1>
+        <p>The shell is your conversation with the OS. This module covers the shell types, the “magic” of pipes and redirection, the core commands, regular expressions, and writing your first scripts — with a live terminal you can actually type into.</p>
+      </div>
+
+      <!-- 3.1 shells -->
+      <h2 class="sec"><span class="n">1</span> What is a Shell?</h2>
+      <div class="card">
+        <p class="lead">A <span class="term">shell</span> acts as an <b>interpreter between you and the operating system</b> — an advanced way to converse with the system. It gives you access to commands, scripts and libraries, and talks to the <b>kernel</b> on your behalf.</p>
+        <table class="cmp">
+          <tr><th>Shell</th><th>Character</th></tr>
+          <tr><td>sh (Bourne)</td><td>The <b>original</b> UNIX shell. Small, basic, few features.</td></tr>
+          <tr><td>bash (Bourne Again)</td><td>The standard <b>GNU</b> shell and the default on Linux. A <b>superset of sh</b> — everything that works in sh works in bash (not always the reverse). Intuitive yet powerful.</td></tr>
+          <tr><td>csh (C shell)</td><td>Syntax resembles the <b>C language</b>. Added the useful <b>history</b> feature and job control.</td></tr>
+          <tr><td>tcsh (Turbo C)</td><td>A superset of csh — more user-friendly and faster.</td></tr>
+          <tr><td>ksh (Korn)</td><td>A superset of the Bourne shell, liked by people with a UNIX background.</td></tr>
+        </table>
+        <p>In Linux, <b>“everything is a file.”</b> The list of valid installed shells lives in <code>/etc/shells</code>. To see your own shell: <code>echo $SHELL</code>.</p>
+      </div>
+
+      <!-- 3.2 pipes & redirection -->
+      <h2 class="sec"><span class="n">2</span> The Two Superpowers: Piping & Redirection</h2>
+      <div class="grid2">
+        <div class="card">
+          <h3 class="h3" style="margin-top:0">| Piping</h3>
+          <p>Takes the <b>output of one command</b> and feeds it as the <b>input to the next</b>. Data flows through a pipeline of processes.</p>
+          <div class="code"><span class="p">command1</span> | <span class="p">command2</span> | <span class="p">command3</span></div>
+        </div>
+        <div class="card">
+          <h3 class="h3" style="margin-top:0">&gt; Redirection</h3>
+          <p>Sends output <b>away from the screen</b> to somewhere else — usually a file.</p>
+          <div class="code"><span class="p">ls</span> -R / | <span class="p">grep</span> httpd.conf <span class="g">&gt;</span> results.txt</div>
+        </div>
+      </div>
+      <div class="note analogy">
+        <span class="tag">🏭 Real-world analogy — A factory assembly line</span>
+        A <b>pipe</b> <code>|</code> is the <b>conveyor belt</b>: the half-built product from station 1 rolls straight into station 2. <b>Redirection</b> <code>&gt;</code> is the <b>packing box at the end</b> — instead of the product coming out to you (the screen), it gets boxed and stored (a file). Example: <code>ls -R</code> lists the <em>whole</em> filesystem; the belt sends it into <code>grep</code> which filters for one filename; <code>&gt;</code> boxes the survivors into a file.
+      </div>
+
+      <div class="card">
+        <h3 class="h3">Control operators (combine commands)</h3>
+        <table class="cmp">
+          <tr><th>Symbol</th><th>Name</th><th>Function</th></tr>
+          <tr><td>|</td><td>pipe</td><td>Pass one command's output to another</td></tr>
+          <tr><td>&gt;</td><td>redirect</td><td>Output redirection (overwrite file)</td></tr>
+          <tr><td>&gt;&gt;</td><td>append</td><td>Append output to file</td></tr>
+          <tr><td>&lt;</td><td>input redirect</td><td>Feed a file in as input</td></tr>
+          <tr><td>;</td><td>semicolon</td><td>Run commands in sequence (each is its own process/PID)</td></tr>
+          <tr><td>&amp;&amp;</td><td>and</td><td>Run 2nd command <b>only if</b> the 1st <b>succeeds</b></td></tr>
+          <tr><td>||</td><td>or</td><td>Run 2nd command <b>only if</b> the 1st <b>fails</b></td></tr>
+          <tr><td>&amp;</td><td>ampersand</td><td>Run a job in the <b>background</b> (in a subshell)</td></tr>
+          <tr><td>( )</td><td>parentheses</td><td>Run commands in a <b>subshell</b></td></tr>
+        </table>
+        <p style="font-size:.9rem;color:var(--ink-soft)">Handy extras: <b>Tab</b> = auto-completion. <b>history</b> = every command is logged (via the <code>HISTFILE</code> variable, e.g. <code>.bash_history</code>). Arithmetic: <code>((expr))</code>. File/string tests: <code>[[ expr ]]</code>. Predefined variables include <code>PWD</code>, <code>OLDPWD</code>, <code>PATH</code>, <code>HISTFILE</code>, <code>HISTSIZE</code>, <code>EDITOR</code>, <code>SECONDS</code>.</p>
+      </div>
+
+      <!-- 3.3 core commands -->
+      <h2 class="sec"><span class="n">3</span> Core Commands & Live Terminal</h2>
+      <div class="card">
+        <div class="flip-grid" id="linuxCmds"></div>
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">💻 Live Bash Terminal (simulated) <span class="pill">Interactive</span></div>
+        <div class="lab-desc">Type real commands and press Enter. Try: <code>echo $SHELL</code> · <code>ls -l</code> · <code>pwd</code> · <code>cat /etc/passwd</code> · <code>cat /etc/passwd | grep root</code> · <code>cut -d: -f1 /etc/passwd</code> · <code>cut -d: -f1 /etc/passwd | sort</code> · <code>help</code></div>
+        <div class="term-sim">
+          <div class="term-bar"><i class="t1"></i><i class="t2"></i><i class="t3"></i><span>student@kali: ~</span></div>
+          <div class="term-body" id="termBody"><div class="out">Kali Linux — type <b>help</b> for available commands.</div></div>
+          <div class="term-input"><span class="prompt">student@kali:~$</span><input id="termInput" autocomplete="off" spellcheck="false" placeholder="type a command…"></div>
+        </div>
+      </div>
+
+      <!-- 3.4 regex -->
+      <h2 class="sec"><span class="n">4</span> Regular Expressions (for grep)</h2>
+      <div class="card">
+        <p class="lead">A <span class="term">regular expression</span> is a <b>pattern that describes a set of strings</b>. Most letters/digits match themselves; special <b>metacharacters</b> add power (escape them with <code>\</code> to match literally).</p>
+        <table class="cmp">
+          <tr><th>Pattern</th><th>Meaning</th></tr>
+          <tr><td>[0-9]</td><td>Any single digit (a <b>bracket/range</b> expression)</td></tr>
+          <tr><td>[^abc]</td><td>Any character <b>not</b> a, b or c (leading <code>^</code> = negate)</td></tr>
+          <tr><td>?</td><td>Preceding item optional — matched <b>at most once</b></td></tr>
+          <tr><td>*</td><td>Preceding item matched <b>zero or more</b> times</td></tr>
+          <tr><td>+</td><td>Preceding item matched <b>one or more</b> times</td></tr>
+          <tr><td>{n} / {n,} / {n,m}</td><td>Exactly n / at least n / between n and m times</td></tr>
+        </table>
+      </div>
+
+      <!-- 3.5 scripting -->
+      <h2 class="sec"><span class="n">5</span> Writing Scripts</h2>
+      <div class="card">
+        <p class="lead">A <b>script</b> is a collection of commands stored in a file that the shell reads and runs as if you typed them. To run one, you must: <b>write it</b>, <b>give the shell permission to execute it</b>, and <b>put it where the shell can find it</b>.</p>
+        <div class="code"><span class="c">#!/bin/bash</span>          <span class="c"># the "shebang": tells the shell to use /bin/bash</span>
+<span class="c"># My first script</span>       <span class="c"># everything after # is a comment (ignored)</span>
+
+<span class="p">echo</span> <span class="g">"Hello World!"</span>   <span class="c"># prints to the screen</span></div>
+        <ul class="clean">
+          <li><b>Line 1 — the shebang</b> <code>#!/bin/bash</code> tells the shell which interpreter to use (perl, python, etc. use the same trick).</li>
+          <li><b>Comments</b> start with <code>#</code> and are vital as scripts grow.</li>
+          <li><b>Make it executable</b> with <code>chmod</code>: set permissions to <b>rwx</b> for you (read+write+execute). In the editor the filename turns from green → <b>yellow</b> to show it's now runnable.</li>
+          <li><b>Run it</b> with a leading <code>./</code> — e.g. <code>./first_script</code>.</li>
+        </ul>
+      </div>
+      <div class="note"><span class="tag2" style="font-weight:800">🔑 The passwd file format</span> A recurring exam favourite. Each line of <code>/etc/passwd</code> is:<br><code>username:password:UID:GID:GECOS:home_directory:shell</code><br>So <code>cut -d: -f1 /etc/passwd</code> grabs field 1 (the username), using <code>:</code> as the delimiter. Pipe it into <code>| sort</code> to alphabetise.</div>
+
+      <div class="quiz" data-quiz>
+        <div class="q"><span class="qn">Q</span> What does <code>cut -d: -f1 /etc/passwd | sort</code> produce?</div>
+        <div class="opt" data-c="0"><span class="mk"></span> Every user's encrypted password, newest first</div>
+        <div class="opt" data-c="1"><span class="mk"></span> All usernames on the system, in alphabetical order</div>
+        <div class="opt" data-c="0"><span class="mk"></span> The whole passwd file with line numbers</div>
+        <div class="explain">✅ <code>cut</code> with delimiter <code>:</code> and field 1 extracts the <b>username</b> from each line; the pipe sends that list to <code>sort</code>, which alphabetises it.</div>
+      </div>
+
+      <div class="section-done"><button class="done-btn" data-done="linux">✓ Mark Module 3 understood</button></div>
+    </section>
+
+    <!-- ============================================================ MODULE 4: VIRTUAL MEMORY -->
+    <section class="module" id="m-vm">
+      <div class="hero">
+        <span class="kicker">Module 4</span>
+        <h1>🧠 Virtual Memory</h1>
+        <p>The brilliant illusion that lets a 4&nbsp;GB machine run programs needing far more than 4&nbsp;GB — by keeping only the <b>pages you're using</b> in RAM and parking the rest on disk. This module has the two biggest interactive tools in the whole lab.</p>
+      </div>
+
+      <!-- 4.1 need -->
+      <h2 class="sec"><span class="n">1</span> Why We Need Virtual Memory</h2>
+      <div class="card">
+        <p class="lead">Memory is a <b>limited resource</b> (e.g. 4&nbsp;GB). The problem: what if the <b>total memory needed by all processes &gt; physical memory</b>? For instance 4&nbsp;GB RAM, a 1&nbsp;TB disk, but OS + processes want 5.5&nbsp;GB.</p>
+        <ul class="clean">
+          <li>The <b class="key">Long-Term Scheduler</b> could just <b>refuse</b> to admit new processes until others finish and free memory — but that's restrictive.</li>
+          <li><span class="term">Virtual memory</span> is the better solution: <b>keep part of a process in RAM, leave the rest on the hard disk.</b> A machine with X physical memory can run processes whose total need is <b>&gt; X</b>.</li>
+          <li>The <b class="key">allocation scheme</b> decides which parts live in RAM. General idea: keep the data/instructions that are <b>being used now</b> or <b>likely to be used soon</b>. This is implemented via <b>demand paging</b> (or demand segmentation).</li>
+        </ul>
+        <div class="chips"><span class="chip">Logical address space can be &gt; physical</span><span class="chip">More processes can run at once</span><span class="chip">A process can be bigger than RAM</span></div>
+      </div>
+      <div class="note analogy">
+        <span class="tag">🍳 Real-world analogy — The tiny kitchen counter</span>
+        Your <b>counter (RAM)</b> is tiny, but your <b>pantry (disk)</b> is huge. You don't put every ingredient on the counter — only what you need for the <b>current step</b> of the recipe. When the recipe needs flour that's still in the pantry, you pause, fetch it (a <b>page fault</b>), maybe put something else back to make room (<b>page replacement</b>), and continue. The illusion: you can cook a feast far bigger than your counter.
+      </div>
+
+      <!-- 4.2 demand paging -->
+      <h2 class="sec"><span class="n">2</span> Demand Paging & Page Faults</h2>
+      <div class="card">
+        <p class="lead"><span class="term">Demand paging</span>: bring a page into memory <b>only when it's needed</b> — a <b class="key">“lazy” approach</b>. Processes live in secondary memory; only the required pages come into RAM.</p>
+        <ul class="clean">
+          <li>Each page-table entry has a <b class="key">valid–invalid bit</b>: <b>1</b> = page is in memory, <b>0</b> = not in memory. Initially all set to <b>0</b>.</li>
+          <li>When a process references a page whose bit is <b>0</b>, a <span class="term">page fault</span> is generated — an <b>interrupt</b> telling the OS the referenced page isn't in memory.</li>
+          <li>The OS checks the table in the <b>Process Control Block (PCB)</b>: if the reference is <b>invalid</b> (not in the address space) → <b>abort</b>; if just <b>not in memory</b> → <b>bring it in</b>.</li>
+        </ul>
+        <h3 class="h3">Servicing a page fault</h3>
+        <div class="flow">
+          <div class="box dark">Page fault</div><span class="arr">→</span>
+          <div class="box">Find a free frame (or a <b>victim</b>)</div><span class="arr">→</span>
+          <div class="box">Swap the page in from disk</div><span class="arr">→</span>
+          <div class="box">Update page table + PCB (valid = 1)</div><span class="arr">→</span>
+          <div class="box alt">Restart the instruction</div>
+        </div>
+        <p><b>The very first reference to any page always causes a page fault</b> (it starts on disk).</p>
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">📄 Demand Paging Simulator <span class="pill">Interactive</span></div>
+        <div class="lab-desc">A process references pages one at a time. Watch valid bits flip and page faults fire when a page isn't yet in a frame.</div>
+        <div class="controls">
+          <div class="field"><label>Frames in RAM</label><input type="number" id="dpFrames" value="3" min="1" max="6"></div>
+          <div class="field"><label>Reference string</label><input type="text" id="dpRef" value="0 2 8 2 8 16 0" style="min-width:180px"></div>
+          <button class="btn" id="dpStep">Step ▶</button>
+          <button class="btn ghost" id="dpReset">Reset</button>
+        </div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
+          <div>
+            <div style="font-size:.78rem;font-weight:700;color:var(--ink-soft);margin-bottom:6px">PHYSICAL FRAMES</div>
+            <div id="dpFramesView" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div style="font-size:.78rem;font-weight:700;color:var(--ink-soft);margin-bottom:6px">REFERENCE STRING</div>
+            <div id="dpRefView" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+            <div id="dpLog" style="margin-top:12px;font-size:.9rem"></div>
+          </div>
+        </div>
+        <div class="readout"><div class="r"><b id="dpFaults">0</b><span>Page faults</span></div><div class="r"><b id="dpHits">0</b><span>Hits</span></div></div>
+      </div>
+
+      <!-- 4.3 EAT -->
+      <h2 class="sec"><span class="n">3</span> Performance: Effective Access Time (EAT)</h2>
+      <div class="card">
+        <p class="lead">Page faults are <b>expensive</b> (context switch, interrupt, find frame, disk transfer, update tables, restart). We measure the real cost with <span class="term">EAT</span>.</p>
+        <p>Let <b>p</b> = page-fault rate (0 ≤ p ≤ 1). If p = 0, no faults; if p = 1, every reference faults.</p>
+        <div class="code" style="background:var(--primary-wash);color:var(--ink)">EAT = (1 − p) × <span class="r">memory access time</span> + p × (<span class="r">page-fault service time</span>)</div>
+        <p><b>Worked example from the slides:</b> memory access = 100&nbsp;ns, swap time = 10&nbsp;ms = 10,000,000&nbsp;ns, and p = 0.5:</p>
+        <div class="code">EAT = (1−0.5)×100 + 0.5×(10,000,000 + 100)
+    = 50 + 5,000,050
+    = <span class="g">5,000,100 ns</span>   ← ~50,000× slower than the 100 ns RAM!</div>
+        <p>The lesson: <b>the page-fault rate has a huge effect</b> — even a modest fault rate wrecks performance.</p>
+      </div>
+      <div class="lab">
+        <div class="lab-head">🧮 EAT Calculator <span class="pill">Interactive</span></div>
+        <div class="lab-desc">Drag the page-fault rate and watch how catastrophically EAT grows. This is why we work so hard to avoid faults.</div>
+        <div class="controls">
+          <div class="field"><label>Memory access time (ns)</label><input type="number" id="eatMem" value="100"></div>
+          <div class="field"><label>Swap / fault service (ns)</label><input type="number" id="eatSwap" value="10000000"></div>
+          <div class="field" style="min-width:220px"><label>Page-fault rate p = <span id="eatPval">0.50</span></label><input type="range" id="eatP" min="0" max="1" step="0.001" value="0.5"></div>
+        </div>
+        <div class="readout"><div class="r"><b id="eatOut">—</b><span>Effective Access Time (ns)</span></div><div class="r"><b id="eatSlow">—</b><span>× slower than RAM</span></div></div>
+      </div>
+
+      <!-- 4.4 page replacement -->
+      <h2 class="sec"><span class="n">4</span> Page-Replacement Algorithms ⭐</h2>
+      <p class="sec-sub">The heart of the module and your exam. When RAM is full and a new page is needed, <b>which page do we evict?</b></p>
+      <div class="card">
+        <p>We judge an algorithm by running it on a <b>reference string</b> and counting <b>page faults</b> — lower is better. The classic slide string is <code>1 2 3 4 1 2 5 1 2 3 4 5</code>.</p>
+        <table class="cmp">
+          <tr><th>Algorithm</th><th>Rule</th><th>Note</th></tr>
+          <tr><td>FIFO</td><td>Evict the page that has been in memory <b>longest</b> (first in, first out)</td><td>Simple, but can suffer <b>Belady's Anomaly</b>: <em>more frames can cause more faults!</em></td></tr>
+          <tr><td>Optimal (OPT)</td><td>Evict the page that <b>won't be used for the longest time in the future</b></td><td>Gives the <b>fewest possible faults</b> — but needs to see the future, so it's only a <b>theoretical benchmark</b>.</td></tr>
+          <tr><td>LRU</td><td>Evict the page <b>not used for the longest time</b> (recent past ≈ future)</td><td>The practical stand-in for Optimal. Implemented with <b>counters</b> (timestamp on each use) or a <b>stack</b> (move page to top on use; bottom = LRU).</td></tr>
+        </table>
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">🎬 Page-Replacement Visualiser — FIFO · LRU · Optimal <span class="pill">Star tool</span></div>
+        <div class="lab-desc">Enter a reference string and frame count, pick an algorithm, then <b>Step</b> through or <b>Auto-play</b>. Faults are marked <span style="color:var(--danger);font-weight:800">F</span>, hits <span style="color:var(--accent-2);font-weight:800">✓</span>, the incoming page glows orange and the evicted victim flashes red.</div>
+        <div class="controls">
+          <div class="field"><label>Reference string</label><input type="text" id="prRef" value="1 2 3 4 1 2 5 1 2 3 4 5" style="min-width:230px"></div>
+          <div class="field"><label>Frames</label><input type="number" id="prFrames" value="3" min="1" max="7"></div>
+          <div class="field"><label>Algorithm</label><select id="prAlgo"><option value="fifo">FIFO</option><option value="lru">LRU</option><option value="opt">Optimal</option></select></div>
+        </div>
+        <div class="steprow">
+          <button class="btn" id="prStep">Step ▶</button>
+          <button class="btn ghost" id="prAuto">Auto-play ⏩</button>
+          <button class="btn ghost sm" id="prReset">Reset</button>
+          <span class="stepinfo" id="prInfo">Ready. Press Step to begin.</span>
+        </div>
+        <div style="overflow-x:auto"><div class="pr-grid" id="prGrid"></div></div>
+        <div class="readout"><div class="r"><b id="prFaults">0</b><span>Page faults</span></div><div class="r"><b id="prHits">0</b><span>Hits</span></div><div class="r"><b id="prRate">0%</b><span>Fault rate</span></div></div>
+      </div>
+      <div class="note warn"><span class="tag">🤯 Try this — see Belady's Anomaly yourself</span> Set the algorithm to <b>FIFO</b> and reference string <code>1 2 3 4 1 2 5 1 2 3 4 5</code>. Run it with <b>3 frames</b> (note the faults), then with <b>4 frames</b>. With FIFO, going from 3→4 frames <b>increases</b> faults from 9 to 10 — the counter-intuitive Belady's Anomaly. (Optimal and LRU never do this.)</div>
+
+      <!-- 4.5 allocation + thrashing -->
+      <h2 class="sec"><span class="n">5</span> Frame Allocation, Locality & Thrashing</h2>
+      <div class="grid2">
+        <div class="card">
+          <h3 class="h3" style="margin-top:0">Allocating frames to processes</h3>
+          <ul class="clean">
+            <li><b class="key">Equal allocation:</b> every process gets an equal share. 100 frames, 5 processes → 20 each.</li>
+            <li><b class="key">Proportional allocation:</b> by process size. 100 frames with P1=400K, P2=200K, P3=200K → 50 / 25 / 25.</li>
+          </ul>
+          <h3 class="h3">Global vs local replacement</h3>
+          <ul class="clean">
+            <li><b>Global:</b> can steal a frame from <b>any</b> process (even a different one).</li>
+            <li><b>Local:</b> can only replace among the faulting process's <b>own</b> frames.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="h3" style="margin-top:0">The Locality Model</h3>
+          <p>Over any period, a process tends to reference a <b>stable set</b> of pages — a <span class="term">locality</span>. Later it shifts to a new locality; localities can overlap (some pages used throughout).</p>
+          <h3 class="h3">Thrashing</h3>
+          <p>If a process lacks <b>“enough” pages</b>, its fault rate goes <b>very high</b> → it spends all its time <b>swapping pages in and out</b> instead of executing → CPU utilisation collapses. <b>Cause:</b> Σ(sizes of current localities of all processes) &gt; total physical memory.</p>
+        </div>
+      </div>
+      <div class="note analogy">
+        <span class="tag">📚 Real-world analogy — Studying at a cramped desk</span>
+        Your desk (RAM) fits 3 books. While studying one chapter (a <b>locality</b>) you keep pulling 3 related books. If your desk only fits 1 book but you constantly need 3, you spend all your time <b>walking to the shelf and back</b> (swapping) and almost none <b>actually reading</b>. That's <b>thrashing</b>: maximum effort, near-zero progress.
+      </div>
+
+      <!-- 4.6 windows/linux VM + multilevel -->
+      <h2 class="sec"><span class="n">6</span> Windows & Linux Virtual Memory + Multi-Level Page Tables</h2>
+      <div class="card">
+        <p class="lead">Windows memory management is done by the <b>Virtual Memory Manager</b> (part of the NT Executive). It uses <b>4&nbsp;KB pages</b>; each process gets a <b>4&nbsp;GB virtual address space</b> (32-bit address). Both Windows and Linux use a <b class="key">multi-level page table</b>.</p>
+        <h3 class="h3">Why multi-level? (the key exam reason)</h3>
+        <p>A single flat page table for 4&nbsp;GB would need <code>4 × 4GB / 4K = 4&nbsp;MB</code> of <b>contiguous</b> memory — a lot to reserve in one block. A multi-level table can be <b>split into 4&nbsp;KB pages</b>, so the OS never needs one huge contiguous area.</p>
+        <div class="code">32-bit logical address:
+┌───────────┬───────────┬──────────────┐
+│ 10 bits   │ 10 bits   │  12 bits     │
+│ Page Dir  │ Page Tbl  │  Offset      │
+│ (1024 PDE)│ (1024 PTE)│  (4K page)   │
+└───────────┴───────────┴──────────────┘</div>
+        <ul class="clean">
+          <li><b>Top 10 bits</b> → index into the <b>Page Directory</b> (1024 Page Directory Entries). Each PDE points to a page table.</li>
+          <li><b>Next 10 bits</b> → index into the <b>Page Table</b> (1024 Page Table Entries). Each PTE is 4 bytes / 32 bits, holds a <b>20-bit</b> frame address, and points to a physical frame.</li>
+          <li><b>Bottom 12 bits</b> → the <b>offset</b> within the 4&nbsp;KB frame.</li>
+          <li>Final physical address = 20-bit frame address <b>concatenated</b> with the 12-bit offset. <b>Associative registers</b> cache recent PTEs. Each page table / directory fits in a single 4K page.</li>
+          <li><b>Linux</b> works the same way: top 20 bits = page number (via multi-level table), bottom 12 bits = offset.</li>
+        </ul>
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">🗺️ Multi-Level Address Translator <span class="pill">Interactive</span></div>
+        <div class="lab-desc">Type a 32-bit logical address (in hex). Watch it split into Page-Directory index / Page-Table index / Offset — exactly how Windows & Linux translate.</div>
+        <div class="controls">
+          <div class="field"><label>Logical address (hex, e.g. 0x00403ABC)</label><input type="text" id="mlAddr" value="0x00403ABC" style="min-width:180px"></div>
+          <button class="btn" id="mlGo">Translate ▶</button>
+        </div>
+        <div id="mlOut"></div>
+      </div>
+
+      <!-- 4.7 demand segmentation -->
+      <h2 class="sec"><span class="n">7</span> Demand Segmentation</h2>
+      <div class="card">
+        <p>Used when there isn't enough hardware to implement demand paging. E.g. <b>OS/2</b> allocates memory in <b>segments</b>, tracked by <b>segment descriptors</b>. Each descriptor has a <b>valid bit</b>: if the segment is in memory, access continues; otherwise a <b>segment fault</b> occurs (the segmentation analogue of a page fault).</p>
+      </div>
+
+      <div class="section-done"><button class="done-btn" data-done="vm">✓ Mark Module 4 understood</button></div>
+    </section>
+
+    <!-- ============================================================ MODULE 5: MEMORY MANAGEMENT -->
+    <section class="module" id="m-mm">
+      <div class="hero">
+        <span class="kicker">Module 5</span>
+        <h1>📦 Memory Management</h1>
+        <p>How addresses in your source code become real physical locations, and the schemes an OS uses to hand out memory: contiguous allocation, paging, and segmentation — with simulators for the fit-algorithms and address translation.</p>
+      </div>
+
+      <!-- 5.1 background + binding -->
+      <h2 class="sec"><span class="n">1</span> Address Binding</h2>
+      <div class="card">
+        <p class="lead">A program must be brought from disk into RAM to become a <b>process</b>. Main memory and registers are the <b>only storage the CPU can access directly</b> (registers in ~1 clock, RAM takes many cycles — a cache sits between them). A variable like <code>int count</code> is <b>symbolic</b> in your source; it must eventually become a real address. That mapping happens in stages:</p>
+        <div class="flow">
+          <div class="box">Source: symbolic<br><small>int count</small></div><span class="arr">→</span>
+          <div class="box alt">Compiler → relocatable address</div><span class="arr">→</span>
+          <div class="box dark">Loader → absolute / physical address</div>
+        </div>
+        <p><span class="term">Address binding</span> = mapping one type of address to another. It can happen at three times:</p>
+        <table class="cmp">
+          <tr><th>Binding time</th><th>When address is known</th><th>Consequence</th></tr>
+          <tr><td>Compile time</td><td>Process location known <b>at compile</b></td><td>Compiler writes real addresses directly. Must <b>recompile</b> if the location changes.</td></tr>
+          <tr><td>Link time</td><td>Location <b>not</b> known at compile</td><td>Compiler emits <b>relocatable</b> addresses (offsets from a base address; first word = 0).</td></tr>
+          <tr><td>Execution (run) time</td><td>Location known <b>only when run</b></td><td>Process can be <b>moved during execution</b>; hardware (base/relocation register) makes the real address for <b>every</b> reference. (e.g. C <code>malloc</code>/<code>calloc</code>.)</td></tr>
+        </table>
+      </div>
+
+      <!-- 5.2 logical vs physical + MMU -->
+      <h2 class="sec"><span class="n">2</span> Logical vs Physical Address & the MMU</h2>
+      <div class="card">
+        <div class="grid2">
+          <div class="note" style="margin:0"><span class="tag2" style="font-weight:800">Logical (virtual) address</span> The address <b>generated by the process</b>.</div>
+          <div class="note" style="margin:0"><span class="tag2" style="font-weight:800">Physical address</span> The <b>actual location</b> in the memory chips that holds the data.</div>
+        </div>
+        <p style="margin-top:12px">The <span class="term">Memory-Management Unit (MMU)</span> is hardware that <b>translates logical → physical</b> before the address reaches memory. A simple MMU just <b>adds a relocation register</b> to every address the process generates.</p>
+        <ul class="clean">
+          <li>Logical = physical for <b>compile-time</b> and <b>link-time</b> binding; they <b>differ</b> for <b>run-time</b> binding.</li>
+          <li>The old “base register” is now called the <b class="key">relocation register</b>.</li>
+        </ul>
+      </div>
+      <div class="lab">
+        <div class="lab-head">➕ MMU Relocation Demo <span class="pill">Interactive</span></div>
+        <div class="lab-desc">The process thinks it's using address 0, 346, etc. The MMU quietly adds the relocation register to place it in real memory. From the slides: relocation = 14000 → logical 0 becomes physical 14000; logical 346 → 14346.</div>
+        <div class="controls">
+          <div class="field"><label>Relocation register</label><input type="number" id="mmuReloc" value="14000" step="100"></div>
+          <div class="field"><label>Logical address</label><input type="number" id="mmuLog" value="346"></div>
+        </div>
+        <div class="flow" style="justify-content:flex-start">
+          <div class="box">CPU / process<br><small>logical = <span id="mmuA">346</span></small></div><span class="arr">→</span>
+          <div class="box dark">MMU: + <span id="mmuB">14000</span></div><span class="arr">→</span>
+          <div class="box alt">Physical = <span id="mmuC">14346</span></div>
+        </div>
+      </div>
+
+      <!-- 5.3 contiguous -->
+      <h2 class="sec"><span class="n">3</span> Contiguous Allocation</h2>
+      <div class="card">
+        <p class="lead">A process's memory is held in <b>one single contiguous area</b>. RAM is split into two parts: the <b>resident OS</b> (in low memory) and <b>user processes</b> (in high memory). Protection uses the <b>relocation + limit registers</b> (each logical address must be &lt; limit).</p>
+        <ul class="clean">
+          <li><b>Single-partition:</b> one process at a time.</li>
+          <li><b>Multiple-partition:</b> several processes, one partition each. Free blocks between them are called <span class="term">holes</span>, scattered at various sizes throughout memory. When a process arrives, the OS finds a hole big enough; it tracks allocated and free partitions.</li>
+        </ul>
+      </div>
+
+      <h3 class="h3">Dynamic Storage — First-fit vs Best-fit vs Worst-fit</h3>
+      <table class="cmp">
+        <tr><th>Strategy</th><th>Picks…</th><th>Leftover hole</th></tr>
+        <tr><td>First-fit</td><td>The <b>first</b> hole from the list that's big enough. Fast — stops searching early.</td><td>varies</td></tr>
+        <tr><td>Best-fit</td><td>The <b>smallest</b> hole that's big enough (must search whole list unless sorted).</td><td><b>smallest</b> leftover</td></tr>
+        <tr><td>Worst-fit</td><td>The <b>largest</b> hole (must search whole list).</td><td><b>largest</b> leftover</td></tr>
+      </table>
+
+      <div class="lab">
+        <div class="lab-head">🧩 Fit-Algorithm Simulator <span class="pill">Interactive</span></div>
+        <div class="lab-desc">Set memory partitions and a process to place. Run each strategy and see which hole it chooses. (Try the tutorial set: partitions 500 400 100 700 350, place 212 → 417 → 112 → 426.)</div>
+        <div class="controls">
+          <div class="field"><label>Partition sizes (K)</label><input type="text" id="fitParts" value="500 400 100 700 350" style="min-width:170px"></div>
+          <div class="field"><label>Process size (K)</label><input type="number" id="fitProc" value="426"></div>
+          <div class="field"><label>Strategy</label><select id="fitAlgo"><option value="first">First-fit</option><option value="best">Best-fit</option><option value="worst">Worst-fit</option></select></div>
+          <button class="btn" id="fitGo">Place ▶</button>
+        </div>
+        <div id="fitView" style="display:flex;flex-direction:column;gap:8px"></div>
+        <div id="fitResult" style="margin-top:8px"></div>
+      </div>
+
+      <!-- 5.4 fragmentation -->
+      <h2 class="sec"><span class="n">4</span> Fragmentation</h2>
+      <div class="grid2">
+        <div class="card">
+          <h3 class="h3" style="margin-top:0">External fragmentation</h3>
+          <p>Enough <b>total</b> free memory for a process, but it's <b>not contiguous</b> — scattered in small holes outside the partitions. <b>Fix:</b> <span class="term">compaction</span> — shuffle everything together into one big free block (like defragmenting an HDD). Only possible if relocation is <b>dynamic / execution-time</b>.</p>
+        </div>
+        <div class="card">
+          <h3 class="h3" style="margin-top:0">Internal fragmentation</h3>
+          <p>Memory <b>given</b> to a process is slightly <b>larger</b> than requested; the unused slack sits <b>inside</b> the partition. Happens in paging when the last page isn't full.</p>
+        </div>
+      </div>
+      <div class="lab">
+        <div class="lab-head">🧹 Compaction Demo <span class="pill">Interactive</span></div>
+        <div class="lab-desc">The striped blocks are scattered free holes (external fragmentation). Press Compact to slide processes together into one large free region.</div>
+        <div class="membar" id="fragBar"></div>
+        <button class="btn" id="fragBtn">🧹 Compact memory</button>
+        <div id="fragMsg" style="margin-top:8px;color:var(--ink-soft);font-size:.9rem"></div>
+      </div>
+
+      <!-- 5.5 paging -->
+      <h2 class="sec"><span class="n">5</span> Paging</h2>
+      <div class="card">
+        <p class="lead">Paging lets a process use <b>non-contiguous</b> physical memory. The process's logical memory is split into fixed-size <b>pages</b>; physical memory is split into same-size <b>frames</b> (both typically 0.5K–8K). A page loads into any free frame.</p>
+        <div class="note"><span class="tag2" style="font-weight:800">Example</span> Process = 108&nbsp;KB, page size = 10&nbsp;KB → <b>11 pages</b>: pages 0–9 are 10&nbsp;KB each, page 10 is only 8&nbsp;KB (the leftover → internal fragmentation).</div>
+        <h3 class="h3">Address translation</h3>
+        <p>The CPU's address splits into <b>page number (p)</b> + <b>page offset (d)</b>. <b>p</b> indexes the <b>page table</b> to get the frame's base address; <b>d</b> is added to give the physical address. <b>Paging eliminates external fragmentation</b> but internal fragmentation can remain. There is a <b>separate page table per process</b>.</p>
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">🎯 Paging Address Translator <span class="pill">Interactive</span></div>
+        <div class="lab-desc">Edit the page table (which frame each page maps to), enter a logical address, and watch it translate to a physical address.</div>
+        <div class="controls">
+          <div class="field"><label>Page size (bytes)</label><input type="number" id="pgSize" value="1024" step="256"></div>
+          <div class="field"><label>Logical address</label><input type="number" id="pgLog" value="2500"></div>
+          <button class="btn" id="pgGo">Translate ▶</button>
+        </div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--ink-soft);margin:6px 0">PAGE TABLE (page → frame). Edit the frame numbers:</div>
+        <div id="pgTable" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"></div>
+        <div id="pgOut"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">Page table implementation & the TLB</h3>
+        <ul class="clean">
+          <li>The page table can live in <b>main memory</b>, pointed to by the <b class="key">PTBR</b> (page-table base register); its size is in the <b class="key">PRLR</b> (length register).</li>
+          <li><b>Problem:</b> every access then needs <b>two</b> memory accesses — one to read the page table, one for the data. Slow!</li>
+          <li><b>Solution:</b> the <span class="term">TLB (Translation Look-aside Buffer)</span> — special fast <b>associative registers</b> that allow a <b>parallel search</b> and cache recent page→frame entries.</li>
+          <li><b>Hit:</b> page number found in TLB → read frame directly. <b>Miss:</b> fetch from the page table in memory and add it to the TLB.</li>
+        </ul>
+        <h3 class="h3">Paging EAT with a TLB</h3>
+        <p>Let α = <b>hit ratio</b>, T<sub>a</sub> = TLB lookup time, T<sub>m</sub> = memory access time.</p>
+        <div class="code" style="background:var(--primary-wash);color:var(--ink)">EAT = α(T<sub>a</sub> + T<sub>m</sub>) + (1 − α)(T<sub>a</sub> + 2T<sub>m</sub>)  =  T<sub>a</sub> + 2T<sub>m</sub> − α·T<sub>m</sub></div>
+        <p><b>Slide example:</b> α = 0.8, T<sub>a</sub> = 20&nbsp;ns, T<sub>m</sub> = 100&nbsp;ns → EAT = 20 + 200 − 0.8×100 = <b>140&nbsp;ns</b>. (Hit path = 120&nbsp;ns, miss path = 220&nbsp;ns.)</p>
+      </div>
+
+      <div class="lab">
+        <div class="lab-head">⚡ TLB / Paging EAT Calculator <span class="pill">Interactive</span></div>
+        <div class="lab-desc">See how a higher TLB hit ratio pulls the effective access time down toward the raw memory speed.</div>
+        <div class="controls">
+          <div class="field"><label>TLB lookup T<sub>a</sub> (ns)</label><input type="number" id="tlbTa" value="20"></div>
+          <div class="field"><label>Memory T<sub>m</sub> (ns)</label><input type="number" id="tlbTm" value="100"></div>
+          <div class="field" style="min-width:220px"><label>Hit ratio α = <span id="tlbAval">0.80</span></label><input type="range" id="tlbA" min="0" max="1" step="0.01" value="0.8"></div>
+        </div>
+        <div class="readout"><div class="r"><b id="tlbOut">—</b><span>EAT (ns)</span></div><div class="r"><b id="tlbHit">—</b><span>Hit path (ns)</span></div><div class="r"><b id="tlbMiss">—</b><span>Miss path (ns)</span></div></div>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">Paging — memory protection</h3>
+        <ul class="clean">
+          <li>A <b class="key">valid–invalid bit</b> on each page-table entry: <b>valid</b> = page is in the process's legal address space; <b>invalid</b> = generate an error.</li>
+          <li>A <b class="key">protection bit</b> per entry specifies whether the frame is <b>read/write</b> or <b>read-only</b>.</li>
+        </ul>
+      </div>
+
+      <!-- 5.6 segmentation -->
+      <h2 class="sec"><span class="n">6</span> Segmentation</h2>
+      <div class="card">
+        <p class="lead">Segmentation divides a process's address space into <b>logical units of varying size</b> called <b>segments</b> — a program is a <b>collection of segments</b>: the main routine, groups of functions, global data/arrays/stack, or (in OO languages) individual objects.</p>
+        <div class="note"><span class="tag2" style="font-weight:800">Pages vs Segments</span> Pages are <b>all the same size</b>; segments <b>vary in size</b>. Because segments vary, allocating them is a <b>dynamic storage-allocation problem</b> (first/best/worst-fit again).</div>
+        <h3 class="h3">Segmentation architecture</h3>
+        <p>A logical address is a pair <code>&lt;segment-number, offset&gt;</code>. The <b>segment number</b> indexes the <b>segment table</b> (one per process). Each entry has:</p>
+        <ul class="clean">
+          <li><b class="key">base</b> — the starting physical address of the segment.</li>
+          <li><b class="key">limit</b> — the length of the segment. Offset is legal only if <b>offset &lt; limit</b>.</li>
+        </ul>
+        <p>The <b>STBR</b> (segment-table base register) points to the table; the <b>STLR</b> (length register) gives the number of segments — segment number <b>s</b> is legal if <b>s &lt; STLR</b>. Each entry also has a <b>validation bit</b> and <b>read/write/execute</b> privilege bits.</p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <div class="q"><span class="qn">Q</span> Paging suffers <b>internal</b> fragmentation but eliminates <b>external</b> fragmentation. Why no external fragmentation?</div>
+        <div class="opt" data-c="1"><span class="mk"></span> Because any page can go in any free frame — physical memory need not be contiguous</div>
+        <div class="opt" data-c="0"><span class="mk"></span> Because pages are variable-sized and always fit perfectly</div>
+        <div class="opt" data-c="0"><span class="mk"></span> Because the TLB compacts memory automatically</div>
+        <div class="explain">✅ Frames are fixed-size and interchangeable, so the OS can scatter a process's pages into any free frames — no need for one big contiguous block, so no external fragmentation. Internal fragmentation remains because the <b>last</b> page is usually not completely full.</div>
+      </div>
+
+      <div class="section-done"><button class="done-btn" data-done="mm">✓ Mark Module 5 understood</button></div>
+    </section>
+
+    <!-- ============================================================ EXAM ZONE -->
+    <section class="module" id="m-exam">
+      <div class="hero">
+        <span class="kicker">Practice</span>
+        <h1>🎯 Exam Drill Zone</h1>
+        <p>Questions rebuilt from your tutorial sheets (Virtual Memory & Memory Management) plus mixed-concept checks. Try each before revealing the worked answer.</p>
+      </div>
+
+      <h2 class="sec"><span class="n">1</span> Worked Numerical Problems</h2>
+
+      <div class="card">
+        <h3 class="h3">Q — First/Best/Worst-fit (Memory-Mgmt tutorial Q6)</h3>
+        <p>Partitions (in order): <b>500K, 400K, 100K, 700K, 350K</b>. Place processes (in order): <b>212K, 417K, 112K, 426K</b>. Use the simulator in Module 5 to place each, then check here.</p>
+        <button class="btn ghost sm reveal-btn">Reveal answer</button>
+        <div class="reveal-body">
+          <table class="cmp">
+            <tr><th>Process</th><th>First-fit</th><th>Best-fit</th><th>Worst-fit</th></tr>
+            <tr><td>212K</td><td>500K</td><td>350K</td><td>700K</td></tr>
+            <tr><td>417K</td><td>700K</td><td>500K</td><td>500K (of remaining)</td></tr>
+            <tr><td>112K</td><td>500K→288K leftover</td><td>400K→ no… 100K too small →400K</td><td>488K leftover region</td></tr>
+            <tr><td>426K</td><td>fits in 700K leftover?</td><td>700K</td><td>must wait — no hole big enough</td></tr>
+          </table>
+          <div class="note"><span class="tag2" style="font-weight:800">Key idea</span> <b>Best-fit</b> usually packs most efficiently here because it saves the large 700K hole for the large 426K process, whereas <b>Worst-fit</b> wastes big holes early and can leave 426K unable to fit. Work it step-by-step in the simulator to see leftovers become new holes.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">Q — Paged memory reference time (VM tutorial Q7)</h3>
+        <p>(a) If a memory reference takes <b>200&nbsp;ns</b> and the page table is in memory, how long is a paged reference? (b) With associative registers and a <b>75%</b> hit rate (TLB lookup ≈ 0), what's the effective time?</p>
+        <button class="btn ghost sm reveal-btn">Reveal answer</button>
+        <div class="reveal-body">
+          <div class="code">(a) Two memory accesses (one for page table, one for data):
+    2 × 200 = <span class="g">400 ns</span>
+
+(b) EAT = 0.75 × (200)          ← hit: TLB(0) + 1 memory access
+        + 0.25 × (2 × 200)     ← miss: page-table access + data
+    = 150 + 100 = <span class="g">250 ns</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">Q — EAT with page faults (VM tutorial Q8)</h3>
+        <p>Paging disk avg access = <b>20&nbsp;ms</b>; memory access = <b>1&nbsp;µs</b>; two accesses per reference normally. Associative memory cuts it to one reference on a hit. <b>80%</b> hit the associative memory; of the remaining 20%, <b>10% (=2% of total)</b> cause page faults. Effective access time?</p>
+        <button class="btn ghost sm reveal-btn">Reveal answer</button>
+        <div class="reveal-body">
+          <div class="code">Hit in assoc. memory (80%):   1 µs
+Miss, no fault (18%):         2 µs   (page table + data)
+Miss + page fault (2%):       ~20 ms = 20000 µs
+
+EAT ≈ 0.80(1) + 0.18(2) + 0.02(20000)
+    ≈ 0.8 + 0.36 + 400
+    ≈ <span class="g">401.16 µs</span>   ← the 2% faults dominate everything</div>
+          <div class="note warn"><span class="tag">Lesson</span> Just <b>2%</b> page faults push EAT from ~1µs to ~400µs. Faults are the enemy.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">Q — Address bits (Memory-Mgmt tutorial Q3)</h3>
+        <p>Logical space = <b>8 pages of 1024 words</b> each, mapped onto <b>32 frames</b>. (a) bits in logical address? (b) bits in physical address?</p>
+        <button class="btn ghost sm reveal-btn">Reveal answer</button>
+        <div class="reveal-body">
+          <div class="code">Offset: 1024 words = 2^10 → 10 bits
+Page number: 8 pages = 2^3 → 3 bits
+(a) Logical = 3 + 10 = <span class="g">13 bits</span>
+
+Frame number: 32 frames = 2^5 → 5 bits
+(b) Physical = 5 + 10 = <span class="g">15 bits</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="h3">Q — Diagnose the system (VM tutorial Q11)</h3>
+        <p>Degree of multiprogramming = 4. For each, what's happening? Increase multiprogramming? Is paging helping?</p>
+        <button class="btn ghost sm reveal-btn">Reveal answer</button>
+        <div class="reveal-body">
+          <table class="cmp">
+            <tr><th>Case</th><th>Diagnosis</th></tr>
+            <tr><td>a) CPU 13%, disk 97%</td><td><b>Thrashing.</b> Disk saturated with paging, CPU starved. <b>Do NOT</b> increase multiprogramming — <b>decrease</b> it. Paging is <b>not</b> helping.</td></tr>
+            <tr><td>b) CPU 87%, disk 3%</td><td>Healthy, CPU-bound. Could <b>increase</b> multiprogramming to use idle time. Paging fine.</td></tr>
+            <tr><td>c) CPU 13%, disk 3%</td><td>Both idle — jobs are <b>I/O-bound on other devices</b> or blocked. Increasing multiprogramming <b>can</b> raise CPU use. Not a paging problem.</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <h2 class="sec"><span class="n">2</span> Rapid-Fire Concept Quiz</h2>
+      <p class="sec-sub">Ten mixed questions across all five modules. Immediate feedback.</p>
+      <div id="examQuiz"></div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:1.1rem;font-weight:700">Your quiz score across the whole lab</div>
+        <div style="font-size:2.6rem;font-weight:800;color:var(--primary-dark)" id="scoreBig">0 / 0</div>
+        <div style="color:var(--ink-soft);font-size:.9rem">Answer questions anywhere in the lab to raise it.</div>
+      </div>
+
+      <div class="section-done"><button class="done-btn" data-done="exam">✓ Mark drill complete</button></div>
+    </section>
+
+    <div class="foot">Built from your COS lecture decks · Interrupts → Windows → Linux → Virtual Memory → Memory Management · Progress saves automatically in this browser.</div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   NAVIGATION + PROGRESS
+   ============================================================ */
+const modules = ['home','hw','win','linux','vm','mm','exam'];
+const crumbNames = {home:'Start Here',hw:'Hardware Support',win:'Windows OS',linux:'Linux & Bash',vm:'Virtual Memory',mm:'Memory Management',exam:'Exam Drill Zone'};
+const store = {
+  get(){try{return JSON.parse(localStorage.getItem('cosLab')||'{}')}catch(e){return{}}},
+  set(o){localStorage.setItem('cosLab',JSON.stringify(o))}
+};
+let state = Object.assign({done:{},score:{correct:0,total:0}}, store.get());
+if(!state.done) state.done={}; if(!state.score) state.score={correct:0,total:0};
+
+function go(m){
+  modules.forEach(x=>{
+    document.getElementById('m-'+x).classList.toggle('active',x===m);
+  });
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.m===m));
+  document.getElementById('crumb').textContent=crumbNames[m];
+  window.scrollTo({top:0,behavior:'smooth'});
+  closeSidebar();
+}
+document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>go(n.dataset.m)));
+
+function updateProgress(){
+  const total = 5; // hw win linux vm mm
+  const keys=['hw','win','linux','vm','mm'];
+  const c = keys.filter(k=>state.done[k]).length;
+  const pct = Math.round(c/total*100);
+  document.getElementById('pfill').style.width=pct+'%';
+  document.getElementById('pctText').textContent=pct+'%';
+  document.querySelectorAll('.done-btn').forEach(b=>{
+    if(state.done[b.dataset.done]){b.classList.add('done');b.textContent='✓ Understood';}
+  });
+}
+document.querySelectorAll('.done-btn').forEach(b=>b.addEventListener('click',()=>{
+  state.done[b.dataset.done]=!state.done[b.dataset.done];
+  b.classList.toggle('done',state.done[b.dataset.done]);
+  b.textContent=state.done[b.dataset.done]?'✓ Understood':('✓ Mark '+(b.dataset.done==='exam'?'drill complete':'section understood'));
+  store.set(state);updateProgress();
+  if(state.done[b.dataset.done]) toast('Nice! Progress saved 🎉');
+}));
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(confirm('Reset all progress and quiz scores?')){localStorage.removeItem('cosLab');location.reload();}
+});
+
+// mobile sidebar
+const sb=document.getElementById('sidebar'),bd=document.getElementById('backdrop');
+function closeSidebar(){sb.classList.remove('open');bd.classList.remove('show');}
+document.getElementById('menuBtn').addEventListener('click',()=>{sb.classList.add('open');bd.classList.add('show');});
+bd.addEventListener('click',closeSidebar);
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ============================================================ QUIZ ENGINE (data-quiz blocks) */
+function wireQuiz(root){
+  root.querySelectorAll('[data-quiz]').forEach(q=>{
+    if(q.dataset.wired)return;q.dataset.wired='1';
+    const opts=q.querySelectorAll('.opt'),ex=q.querySelector('.explain');
+    opts.forEach(o=>o.addEventListener('click',()=>{
+      if(q.dataset.answered)return;q.dataset.answered='1';
+      const right=o.dataset.c==='1';
+      opts.forEach(x=>{x.classList.add('lock');if(x.dataset.c==='1'){x.classList.add('correct');x.querySelector('.mk').textContent='✓';}});
+      if(!right){o.classList.add('wrong');o.querySelector('.mk').textContent='✕';}
+      if(ex)ex.classList.add('show');
+      state.score.total++; if(right)state.score.correct++;
+      store.set(state);refreshScore();
+      toast(right?'Correct! ✅':'Not quite — see the explanation');
+    }));
+  });
+}
+function refreshScore(){const el=document.getElementById('scoreBig');if(el)el.textContent=state.score.correct+' / '+state.score.total;}
+wireQuiz(document);
+refreshScore();
+
+/* reveal buttons */
+document.querySelectorAll('.reveal-btn').forEach(b=>{
+  const body=b.nextElementSibling;body.style.display='none';
+  b.addEventListener('click',()=>{const open=body.style.display==='block';body.style.display=open?'none':'block';b.textContent=open?'Reveal answer':'Hide answer';});
+});
+
+/* ============================================================ M1: INTERRUPT TIMELINE */
+(function(){
+  const start=document.getElementById('intStart'),dev=document.getElementById('devBar'),
+        devL=document.getElementById('devLabel'),cpu=document.getElementById('cpuBar'),
+        st=document.getElementById('intStatus');
+  let running=false;
+  start.addEventListener('click',()=>{
+    if(running)return;running=true;start.disabled=true;
+    let p=0;devL.textContent='Reading disk…';
+    cpu.textContent='Running OTHER work (I/O issued, CPU free) →';
+    st.textContent='System call issued → CPU continues other work while the disk controller reads in parallel.';
+    const iv=setInterval(()=>{
+      p+=2;dev.style.width=Math.min(p,100)+'%';
+      if(p>=100){
+        clearInterval(iv);devL.textContent='✓ done — INTERRUPT!';
+        cpu.textContent='⚡ Interrupted → saving state → running ISR';cpu.style.color='#B35F00';
+        st.innerHTML='<b>Interrupt raised!</b> CPU saves its state, the ISR (part of the OS) handles the completed I/O, then control returns to the interrupted program.';
+        setTimeout(()=>{cpu.textContent='Running user program…';cpu.style.color='';dev.style.width='0%';devL.textContent='';running=false;start.disabled=false;st.textContent='Idle. Ready to run again.';},2600);
+      }
+    },40);
+  });
+})();
+
+/* ============================================================ M1: DUAL MODE */
+(function(){
+  const instrs=[
+    {n:'Add two numbers',priv:false},{n:'Read a variable',priv:false},{n:'Loop / compare',priv:false},
+    {n:'Load base/limit register',priv:true},{n:'Execute an I/O instruction',priv:true},
+    {n:'Load the timer',priv:true},{n:'Change the mode bit',priv:true},{n:'Kill a running program',priv:true}
+  ];
+  let userMode=true;
+  const grid=document.getElementById('instrGrid'),tog=document.getElementById('modeToggle'),res=document.getElementById('modeResult');
+  function render(){
+    grid.innerHTML='';
+    instrs.forEach(i=>{
+      const allowed = !i.priv || !userMode;
+      const d=document.createElement('div');
+      d.style.cssText='border:2px solid '+(allowed?'#2A9D8F':'#E5484D')+';border-radius:12px;padding:12px;background:'+(allowed?'#EAF7F4':'#FDECEC')+';cursor:pointer;transition:.15s';
+      d.innerHTML='<div style="font-weight:700;font-size:.9rem">'+i.n+'</div><div style="font-size:.75rem;color:'+(i.priv?'#B35F00':'#6B6459')+';margin-top:4px">'+(i.priv?'🔒 privileged':'✓ unprivileged')+'</div><div style="margin-top:8px;font-weight:800;color:'+(allowed?'#2A9D8F':'#E5484D')+'">'+(allowed?'✓ ALLOWED':'✕ BLOCKED → trap!')+'</div>';
+      d.addEventListener('click',()=>{
+        if(i.priv&&userMode){res.innerHTML='<div class="note warn" style="margin-top:6px"><span class="tag">Protection fault</span> A user-mode program tried a <b>privileged instruction</b> ('+i.n+'). The hardware blocks it and traps to the OS. Switch to supervisor mode to allow it.</div>';}
+        else{res.innerHTML='<div class="note analogy" style="margin-top:6px"><span class="tag">Executed</span> "'+i.n+'" ran successfully in '+(userMode?'user':'supervisor')+' mode.</div>';}
+      });
+      grid.appendChild(d);
+    });
+  }
+  tog.addEventListener('click',()=>{userMode=!userMode;tog.textContent=userMode?'User mode (1)':'Supervisor mode (0)';tog.style.background=userMode?'':'#2A6F97';tog.style.color=userMode?'':'#fff';res.innerHTML='';render();});
+  render();
+})();
+
+/* ============================================================ M1: BASE/LIMIT */
+(function(){
+  const base=document.getElementById('blBase'),lim=document.getElementById('blLimit'),addr=document.getElementById('blAddr'),
+        band=document.getElementById('blBand'),ptr=document.getElementById('blPtr'),res=document.getElementById('blResult'),
+        canvas=document.getElementById('blCanvas'),btn=document.getElementById('blCheck');
+  function draw(){
+    const B=+base.value,L=+lim.value,A=+addr.value;
+    const scaleMax=Math.max(B+L, A, B+L)*1.25+1;
+    const w=canvas.clientWidth;
+    band.style.left=(B/scaleMax*w)+'px';band.style.width=(L/scaleMax*w)+'px';
+    ptr.style.left=(A/scaleMax*w)+'px';
+    const ok = A>=B && A<B+L;
+    res.innerHTML='<div class="note '+(ok?'analogy':'warn')+'" style="margin-top:8px"><span class="tag">'+(ok?'✓ Access granted':'✕ Access violation → trap to OS')+'</span>'+
+      'Check: base ('+B+') ≤ address ('+A+') &lt; base+limit ('+(B+L)+') → <b>'+(ok?'TRUE':'FALSE')+'</b>. '+
+      (ok?'The address falls inside the program’s legal region.':'The address is outside the legal region, so the hardware raises an <b>error interrupt</b> and the OS deals with the offending program.')+'</div>';
+  }
+  [base,lim,addr].forEach(e=>e.addEventListener('input',draw));btn.addEventListener('click',draw);
+  window.addEventListener('resize',draw);setTimeout(draw,60);
+})();
+
+/* ============================================================ M1: MEMORY HIERARCHY PYRAMID */
+(function(){
+  const levels=[
+    {n:'CPU Registers',w:'26%',c:'#B35F00',speed:'Fastest (≤1 clock)',cost:'Highest cost/byte',size:'Bytes',vol:'Volatile',note:'The only storage the CPU uses at full speed. Holds the values being worked on right now.'},
+    {n:'Cache (L1/L2/L3)',w:'40%',c:'#E07E00',speed:'Very fast',cost:'Very high',size:'KB–MB',vol:'Volatile',note:'A fast copy of the hottest data from main memory. Bridges the huge speed gap between registers and RAM.'},
+    {n:'Main Memory (RAM)',w:'56%',c:'#FF9A00',speed:'Fast',cost:'Moderate',size:'GB',vol:'Volatile',note:'The only LARGE area the CPU can access directly. Volatile & not big enough for everything — hence virtual memory.'},
+    {n:'Solid-State / Disk Cache',w:'72%',c:'#FFB84D',speed:'Slower',cost:'Low',size:'GB–TB',vol:'Non-volatile',note:'Faster secondary storage; a disk cache (e.g. 64MB) also sits here to speed up the slow HDD.'},
+    {n:'Secondary Storage (HDD/DVD/USB)',w:'92%',c:'#FFD9A0',speed:'Slowest',cost:'Lowest cost/byte',size:'TB+',vol:'Non-volatile',note:'Huge, cheap, permanent. Extends main memory and holds swapped-out virtual-memory pages.'}
+  ];
+  const p=document.getElementById('pyramid'),d=document.getElementById('pyrDetail');
+  levels.forEach(l=>{
+    const r=document.createElement('div');r.className='pyr-row';r.style.width=l.w;r.style.background=l.c;
+    r.innerHTML='<span>'+l.n+'</span>';
+    r.addEventListener('click',()=>{
+      d.innerHTML='<b style="color:'+l.c+';font-size:1.05rem">'+l.n+'</b><div class="chips" style="margin:8px 0"><span class="chip">⚡ '+l.speed+'</span><span class="chip">💰 '+l.cost+'</span><span class="chip">📦 '+l.size+'</span><span class="chip">'+(l.vol==='Volatile'?'⚠️ ':'🔒 ')+l.vol+'</span></div><p>'+l.note+'</p>';
+    });
+    p.appendChild(r);
+  });
+})();
+
+/* ============================================================ M2: WINDOWS TIMELINE */
+(function(){
+  const vers=[
+    {v:'1.0–3.1',fam:'DOS',d:'GUI front-end on top of MS-DOS command line. Not a real OS on its own.'},
+    {v:'95',fam:'Consumer',d:'Still DOS-based, but added 32-bit apps, Plug & Play, virtual memory, multitasking and long filenames.'},
+    {v:'98 / ME',fam:'Consumer',d:'Further developments but still built on legacy MS-DOS code — often unstable.'},
+    {v:'NT 3.1–4.0',fam:'Business',d:'"New Technology": written from scratch in 32-bit code (with IBM, like OS/2). Focus on security & reliability.'},
+    {v:'2000',fam:'Merge',d:'NT 5, re-branded for BOTH consumer and business — began ending the expensive two-family split.'},
+    {v:'XP',fam:'Merge',d:'Essentially NT 5.1 — a simple development from Windows 2000.'},
+    {v:'Vista',fam:'Merge',d:'Based on XP; essentially NT 6.'},
+    {v:'7',fam:'Merge',d:'Rewrote the Vista kernel (RISC code) to improve speed & efficiency.'},
+    {v:'8 / 8.1',fam:'Merge',d:'Completely new touch interface — smaller, faster, backward compatible; desktop AND tablets.'},
+    {v:'10',fam:'Merge',d:'Added Cortana (a virtual assistant like Siri/Alexa) and HoloLens AR.'}
+  ];
+  const famC={DOS:'#6B6459',Consumer:'#2A6F97',Business:'#B35F00',Merge:'#FF9A00'};
+  const tl=document.getElementById('winTimeline'),det=document.getElementById('winDetail');
+  vers.forEach(x=>{
+    const b=document.createElement('div');
+    b.style.cssText='flex:none;min-width:82px;text-align:center;cursor:pointer;background:#fff;border:2px solid '+famC[x.fam]+';border-radius:12px;padding:10px 8px;transition:.15s';
+    b.innerHTML='<div style="font-weight:800;color:'+famC[x.fam]+'">Win '+x.v+'</div><div style="font-size:.68rem;color:var(--ink-soft)">'+x.fam+'</div>';
+    b.addEventListener('click',()=>{det.innerHTML='<b style="color:'+famC[x.fam]+'">Windows '+x.v+' · '+x.fam+' line</b><p style="margin-top:6px">'+x.d+'</p>';
+      document.querySelectorAll('#winTimeline>div').forEach(z=>z.style.transform='');b.style.transform='translateY(-4px)';});
+    tl.appendChild(b);
+  });
+})();
+
+/* ============================================================ M2: NT DESIGN GOALS (flip cards) */
+function makeFlips(containerId,cards){
+  const c=document.getElementById(containerId);
+  cards.forEach(x=>{
+    const f=document.createElement('div');f.className='flip';
+    f.innerHTML='<div class="flip-inner"><div class="flip-face flip-front"><div>'+x.f+'</div><small>tap to flip</small></div><div class="flip-face flip-back">'+x.b+'</div></div>';
+    f.addEventListener('click',()=>f.classList.toggle('on'));
+    c.appendChild(f);
+  });
+}
+makeFlips('ntGoals',[
+  {f:'Extensibility',b:'Easy to modify and add features. Needs a <b>highly modular</b> structure — each module with clear responsibilities and interfaces.'},
+  {f:'Portability',b:'Easy to move to different hardware. Most code is <b>platform-independent</b>; direct hardware access is limited to small modules (the HAL).'},
+  {f:'Reliability',b:'The OS protects itself & user data from hardware/software errors. Apps must <b>never crash the OS</b>; behaviour predictable under errors.'},
+  {f:'Compatibility',b:'Runs existing software from earlier systems (DOS, older Windows) and competing systems (Unix, OS/2).'},
+  {f:'Performance',b:'Maximise performance on each platform — consistent with achieving all the other goals.'},
+  {f:'Multiprocessing & Scalability',b:'Exploit the processing power of multiprocessor systems.'},
+  {f:'Distributed Computing',b:'Automatically distribute tasks across a network to other computers as required.'},
+  {f:'Security',b:'Government-certifiable — meet US government <b>C2</b> security certification.'}
+]);
+
+/* ============================================================ M2: WINDOWS ARCHITECTURE (clickable) */
+(function(){
+  const layers=[
+    {n:'User Applications & Subsystems',c:'#2A6F97',mode:'User mode',d:'User programs plus environmental subsystems (which let programs written for other OSes run on Windows) and support processes/services like logon and spooling — organised client/server.'},
+    {n:'NTDLL.dll',c:'#3f7fa3',mode:'Interface',d:'System interface library. Translates subsystem API requests into system calls to NT Executive modules. ".dll" = Dynamic Linked Library: reusable code modules with no main() of their own.'},
+    {n:'NT Executive',c:'#FF9A00',mode:'Kernel mode',d:'Hardware-independent set of peer modules: I/O Manager, Process/Thread Manager, Memory Manager, Cache Manager, Configuration Manager (Registry), Security Reference Monitor, PnP Manager, Power Manager, Object Manager, LPC, Win32 GDI/USER.'},
+    {n:'Kernel (Ntoskrnl.exe)',c:'#E07E00',mode:'Kernel mode',d:'Gives components a common set of processor services regardless of CPU. Handles thread scheduling & synchronisation, interrupt/exception handling, context switching; manages kernel objects.'},
+    {n:'Device Drivers',c:'#B35F00',mode:'Kernel mode',d:'Control I/O devices, file systems (NTFS, Ext2) and network access (TCP/IP). In Windows they do NOT touch hardware directly — they call the HAL.'},
+    {n:'Hardware Abstraction Layer (HAL)',c:'#8a4a00',mode:'Kernel mode',d:'Low-level interface presenting an abstract view of the hardware. Hides hardware-specific details behind a common interface — this is what makes Windows portable. The right HAL is chosen at install time.'},
+    {n:'Physical Hardware',c:'#211E1A',mode:'',d:'The actual CPU, RAM, disks and devices.'}
+  ];
+  const a=document.getElementById('winArch'),d=document.getElementById('winArchDetail');
+  layers.forEach(l=>{
+    const el=document.createElement('div');el.className='arch-layer';el.style.background=l.c;
+    el.innerHTML='<span>'+l.n+'</span>'+(l.mode?'<small style="margin-left:auto">'+l.mode+'</small>':'');
+    el.addEventListener('click',()=>{document.querySelectorAll('.arch-layer').forEach(z=>z.classList.remove('sel'));el.classList.add('sel');
+      d.innerHTML='<b style="color:'+l.c+'">'+l.n+'</b>'+(l.mode?' <span class="chip" style="padding:2px 10px">'+l.mode+'</span>':'')+'<p style="margin-top:6px">'+l.d+'</p>';});
+    a.appendChild(el);
+  });
+})();
+
+/* ============================================================ M2: NT EXECUTIVE COMPONENTS (flip) */
+makeFlips('ntExec',[
+  {f:'I/O Manager',b:'Provides device-independent I/O to other components and manages the device drivers.'},
+  {f:'Process & Thread Manager',b:'Lets components create, manage and terminate threads & processes (using the kernel and kernel objects).'},
+  {f:'Memory Manager',b:'Implements virtual memory — an address space that can exceed actual physical memory.'},
+  {f:'Cache Manager',b:'Manages the disk cache of recently accessed files/data; handles replacement & updating data on disk.'},
+  {f:'Configuration Manager',b:'Implements & manages the Registry — a database of configuration info specific to that PC.'},
+  {f:'Security Reference Monitor',b:'Enforces security policy on objects — limiting access to resources and auditing that access.'},
+  {f:'Plug & Play Manager',b:'Determines which drivers each device needs and loads them automatically, without user intervention.'},
+  {f:'Power Manager',b:'Power-management services — reducing power use of devices including the processor.'},
+  {f:'Object Manager',b:'All Executive elements are objects; supports their creation, deletion and management for other components.'},
+  {f:'LPC (Local Procedure Call)',b:'Implements client/server communication local to the machine — the mechanism behind Windows’ client/server parts.'},
+  {f:'Win32 GDI & USER',b:'Window management (menus, buttons, dialogs) + device-independent 2D graphics (GDI). Moved into lower OS levels for graphics speed.'}
+]);
+
+/* ============================================================ M3: LINUX COMMANDS (flip) */
+makeFlips('linuxCmds',[
+  {f:'ls',b:'List directory contents. <b>-l</b> long format · <b>-a</b> show hidden (dot) files · <b>-R</b> recursive · <b>-t</b> sort by time · <b>-i</b> show inode. First char of -l: d=dir, l=link, b/c=device, p=pipe, s=socket.'},
+  {f:'cd',b:'Change working directory. <code>cd /usr</code> goes there; <code>cd</code> with no arg returns to your HOME directory. Returns 0 on success.'},
+  {f:'cat',b:'Concatenate files to standard output. <code>cat /etc/passwd</code> shows the file. <b>-n</b> numbers all lines · <b>-b</b> numbers non-blank lines.'},
+  {f:'grep',b:'Search files for lines matching a PATTERN. <b>-c</b> count matches · <b>-v</b> invert (non-matching) · <b>-r</b> recursive · <b>-i</b> ignore case. Understands regular expressions.'},
+  {f:'cut',b:'Remove/select sections of each line. <b>-d</b> set delimiter · <b>-f</b> pick fields · <b>-c</b> pick characters. e.g. <code>cut -d: -f1 /etc/passwd</code> = usernames.'},
+  {f:'sort',b:'Sort lines of text. <b>-n</b> numeric · <b>-r</b> reverse · <b>-f</b> ignore case · <b>-M</b> month order. Often piped after cut.'},
+  {f:'pwd',b:'Print working directory — shows where you currently are in the filesystem.'},
+  {f:'mkdir',b:'Make a new directory. e.g. <code>mkdir unixstuff</code>.'},
+  {f:'chmod',b:'Change file permissions. To make a script runnable, give rwx to the user. Then run it with <code>./script</code>.'},
+  {f:'man',b:'Show the manual page for any command. e.g. <code>man date</code>. Your built-in reference.'}
+]);
+
+/* ============================================================ M3: TERMINAL SIM */
+(function(){
+  const body=document.getElementById('termBody'),input=document.getElementById('termInput');
+  const passwd=[
+    'root:x:0:0:root:/root:/bin/bash',
+    'daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin',
+    'bin:x:2:2:bin:/bin:/usr/sbin/nologin',
+    'www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin',
+    'postgres:x:110:117:PostgreSQL:/var/lib/postgresql:/bin/bash',
+    'student:x:1000:1000:Student:/home/student:/bin/bash'
+  ];
+  const lsl=`drwxr-xr-x  2 student student 4096 Aug  2 09:14 backup/
+-rwxr-xr-x  1 student student  128 Aug  2 09:20 first_script
+-rw-r--r--  1 student student   64 Aug  2 09:12 file1
+drwxr-xr-x  3 student student 4096 Aug  2 09:10 unixstuff/`;
+  function print(cmd,out,cls){
+    body.innerHTML+='<div><span class="prompt">student@kali:~$</span> <span class="cmd">'+cmd.replace(/</g,'&lt;')+'</span></div>';
+    if(out!=='')body.innerHTML+='<div class="out '+(cls||'')+'">'+out+'</div>';
+    body.scrollTop=body.scrollHeight;
+  }
+  function run(raw){
+    const cmd=raw.trim();if(!cmd){return;}
+    let out='';
+    const parts=cmd.split('|').map(s=>s.trim());
+    // simple single/known handlers
+    if(cmd==='help'){out='Available: echo $SHELL, ls, ls -l, ls -a, pwd, cat /etc/passwd, grep, cut, sort, whoami, date, clear.\nTry pipes: cat /etc/passwd | grep root';print(cmd,out);return;}
+    if(cmd==='clear'){body.innerHTML='';return;}
+    if(cmd==='echo $SHELL'){print(cmd,'/bin/bash');return;}
+    if(cmd==='pwd'){print(cmd,'/home/student');return;}
+    if(cmd==='whoami'){print(cmd,'student');return;}
+    if(cmd==='date'){print(cmd,new Date().toString());return;}
+    if(cmd==='ls'){print(cmd,'backup  file1  first_script  unixstuff');return;}
+    if(cmd==='ls -a'){print(cmd,'.  ..  .bash_history  backup  file1  first_script  unixstuff');return;}
+    if(cmd==='ls -l'){print(cmd,lsl);return;}
+    // pipeline / passwd based
+    function evalStage(data,stage){
+      if(stage.startsWith('cat')){
+        if(stage.includes('/etc/passwd'))return passwd.slice();
+        return data;
+      }
+      if(stage.startsWith('grep')){
+        const pat=stage.replace('grep','').trim();
+        return (data||[]).filter(l=>l.includes(pat));
+      }
+      if(stage.startsWith('cut')){
+        // cut -d: -f1
+        const dMatch=stage.match(/-d(\S)/),fMatch=stage.match(/-f\s*(\d+)/);
+        const delim=dMatch?dMatch[1]:'\t',fld=fMatch?+fMatch[1]:1;
+        let src=data;
+        if(stage.includes('/etc/passwd'))src=passwd.slice();
+        return (src||[]).map(l=>{const a=l.split(delim);return a[fld-1]||'';});
+      }
+      if(stage.startsWith('sort')){
+        const rev=stage.includes('-r');
+        let a=(data||[]).slice().sort();if(rev)a.reverse();return a;
+      }
+      return data;
+    }
+    let data=null,ok=true;
+    for(const st of parts){
+      if(!/^(cat|grep|cut|sort)/.test(st)){ok=false;break;}
+      data=evalStage(data,st);
+    }
+    if(ok&&data){print(cmd,data.join('\n'));return;}
+    print(cmd,'bash: '+cmd.split(' ')[0]+': command not recognised in this simulator (type help)','r');
+  }
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){run(input.value);input.value='';}});
+})();
+
+/* ============================================================ M4: DEMAND PAGING SIM */
+(function(){
+  const framesIn=document.getElementById('dpFrames'),refIn=document.getElementById('dpRef'),
+        stepBtn=document.getElementById('dpStep'),resetBtn=document.getElementById('dpReset'),
+        fv=document.getElementById('dpFramesView'),rv=document.getElementById('dpRefView'),
+        log=document.getElementById('dpLog'),faultsEl=document.getElementById('dpFaults'),hitsEl=document.getElementById('dpHits');
+  let frames=[],refs=[],idx=0,faults=0,hits=0,nF=3;
+  function reset(){
+    nF=Math.max(1,Math.min(6,+framesIn.value||3));
+    refs=(refIn.value.trim().split(/\s+/).map(Number).filter(n=>!isNaN(n)));
+    frames=Array(nF).fill(null);idx=0;faults=0;hits=0;
+    draw();log.innerHTML='Ready — press <b>Step</b> to reference the next page.';
+  }
+  function draw(hl){
+    fv.innerHTML='';
+    frames.forEach((f,i)=>{
+      const d=document.createElement('div');
+      const isHl=hl&&hl.frame===i;
+      d.style.cssText='display:flex;align-items:center;gap:8px;border:2px solid '+(f===null?'#EBE2D5':(isHl?(hl.fault?'#E5484D':'#2A9D8F'):'#FFE7C2'))+';border-radius:10px;padding:8px 12px;background:'+(f===null?'#fff':(isHl?(hl.fault?'#FDECEC':'#EAF7F4'):'#FFF6EA'))+';min-width:150px;transition:.25s';
+      d.innerHTML='<span style="font-size:.72rem;color:var(--ink-soft);font-weight:700">Frame '+i+'</span><b style="font-size:1.1rem;margin-left:auto">'+(f===null?'—':'Page '+f)+'</b><span style="font-size:.7rem;color:'+(f===null?'#E5484D':'#2A9D8F')+';font-weight:700">valid='+(f===null?0:1)+'</span>';
+      fv.appendChild(d);
+    });
+    rv.innerHTML='';
+    refs.forEach((r,i)=>{
+      const s=document.createElement('div');
+      s.style.cssText='width:32px;height:32px;display:grid;place-items:center;border-radius:8px;font-weight:800;font-size:.9rem;'+
+        (i<idx?'background:var(--primary-tint);color:var(--primary-darker);':i===idx?'background:var(--primary);color:#fff;transform:scale(1.1);':'background:#fff;border:1.5px solid #EBE2D5;color:var(--ink-soft);');
+      s.textContent=r;rv.appendChild(s);
+    });
+    faultsEl.textContent=faults;hitsEl.textContent=hits;
+  }
+  stepBtn.addEventListener('click',()=>{
+    if(idx>=refs.length){log.innerHTML='<b>Done.</b> All references processed. '+faults+' faults, '+hits+' hits.';return;}
+    const page=refs[idx];
+    if(frames.includes(page)){
+      hits++;const fr=frames.indexOf(page);
+      log.innerHTML='Reference <b>page '+page+'</b> → already in Frame '+fr+' (valid bit = 1) → <span style="color:#2A9D8F;font-weight:700">HIT ✓</span>. No disk access.';
+      idx++;draw({frame:fr,fault:false});
+    }else{
+      faults++;let fr=frames.indexOf(null);
+      if(fr===-1){fr=0;/* simple FIFO-ish for demo: replace frame 0 */
+        // shift
+        frames.shift();frames.push(page);fr=nF-1;
+        log.innerHTML='Reference <b>page '+page+'</b> → not in memory (valid bit = 0) → <span style="color:#E5484D;font-weight:700">PAGE FAULT</span>. No free frame → evict oldest, swap page '+page+' in from disk, set valid=1, restart instruction.';
+      }else{
+        frames[fr]=page;
+        log.innerHTML='Reference <b>page '+page+'</b> → not in memory (valid bit = 0) → <span style="color:#E5484D;font-weight:700">PAGE FAULT</span>. Found free Frame '+fr+' → swap in from disk, set valid=1, restart instruction.';
+      }
+      idx++;draw({frame:fr,fault:true});
+    }
+  });
+  resetBtn.addEventListener('click',reset);
+  framesIn.addEventListener('change',reset);refIn.addEventListener('change',reset);
+  reset();
+})();
+
+/* ============================================================ M4: EAT CALCULATOR */
+(function(){
+  const mem=document.getElementById('eatMem'),swap=document.getElementById('eatSwap'),p=document.getElementById('eatP'),
+        pv=document.getElementById('eatPval'),out=document.getElementById('eatOut'),slow=document.getElementById('eatSlow');
+  function calc(){
+    const M=+mem.value,S=+swap.value,P=+p.value;
+    pv.textContent=P.toFixed(3);
+    const eat=(1-P)*M + P*(S+M);
+    out.textContent=Math.round(eat).toLocaleString();
+    slow.textContent=(eat/M).toFixed(0).toLocaleString()+'×';
+    out.style.color = eat>M*100?'#E5484D':'#E07E00';
+  }
+  [mem,swap,p].forEach(e=>e.addEventListener('input',calc));calc();
+})();
+
+/* ============================================================ M4: PAGE REPLACEMENT VISUALISER ⭐ */
+(function(){
+  const refIn=document.getElementById('prRef'),frIn=document.getElementById('prFrames'),algoIn=document.getElementById('prAlgo'),
+        grid=document.getElementById('prGrid'),info=document.getElementById('prInfo'),
+        stepBtn=document.getElementById('prStep'),autoBtn=document.getElementById('prAuto'),resetBtn=document.getElementById('prReset'),
+        fEl=document.getElementById('prFaults'),hEl=document.getElementById('prHits'),rEl=document.getElementById('prRate');
+  let refs=[],nF=3,algo='fifo',step=0,frames=[],meta=[],faults=0,hits=0,cols=[],autoTimer=null;
+  function reset(){
+    stopAuto();
+    refs=refIn.value.trim().split(/\s+/).map(Number).filter(n=>!isNaN(n));
+    nF=Math.max(1,Math.min(7,+frIn.value||3));algo=algoIn.value;
+    step=0;frames=[];meta=[];faults=0;hits=0;cols=[];
+    renderEmpty();info.textContent='Ready — '+algo.toUpperCase()+', '+nF+' frames, '+refs.length+' references.';
+    updateStats();
+  }
+  function renderEmpty(){
+    grid.innerHTML='';
+    refs.forEach((r,i)=>{
+      const c=document.createElement('div');c.className='pr-col';
+      let html='<div class="pr-ref">'+r+'</div>';
+      for(let f=0;f<nF;f++)html+='<div class="pr-cell" data-i="'+i+'" data-f="'+f+'"></div>';
+      html+='<div class="pr-mark" data-mk="'+i+'"></div>';
+      c.innerHTML=html;grid.appendChild(c);
+    });
+  }
+  function optVictim(fr,pos){
+    // choose frame whose page is used farthest in future (or never)
+    let victim=0,farthest=-1;
+    for(let i=0;i<fr.length;i++){
+      let next=Infinity;
+      for(let j=pos+1;j<refs.length;j++){if(refs[j]===fr[i]){next=j;break;}}
+      if(next>farthest){farthest=next;victim=i;}
+    }
+    return victim;
+  }
+  function doStep(){
+    if(step>=refs.length){info.innerHTML='<b>Finished.</b> '+faults+' page faults, '+hits+' hits ('+Math.round(faults/refs.length*100)+'% fault rate).';stopAuto();return false;}
+    const page=refs[step];let fault,victimFrame=-1;
+    const inIdx=frames.indexOf(page);
+    if(inIdx!==-1){
+      fault=false;hits++;
+      if(algo==='lru')meta[inIdx]=step; // update recency
+      info.innerHTML='Ref <b>'+page+'</b>: already in a frame → <span style="color:#2A9D8F;font-weight:700">HIT</span>.';
+    }else{
+      fault=true;faults++;
+      if(frames.length<nF){
+        frames.push(page);meta.push(step);
+        info.innerHTML='Ref <b>'+page+'</b>: not present → <span style="color:#E5484D;font-weight:700">FAULT</span>. Free frame available → load it.';
+      }else{
+        let v;
+        if(algo==='fifo'){ // oldest arrival = smallest meta(arrival)
+          v=0;for(let i=1;i<meta.length;i++)if(meta[i]<meta[v])v=i;
+        }else if(algo==='lru'){ // least recently used = smallest last-use
+          v=0;for(let i=1;i<meta.length;i++)if(meta[i]<meta[v])v=i;
+        }else{ v=optVictim(frames,step); }
+        victimFrame=v;
+        const old=frames[v];
+        frames[v]=page;meta[v]=step;
+        info.innerHTML='Ref <b>'+page+'</b>: not present → <span style="color:#E5484D;font-weight:700">FAULT</span>. Frames full → '+algo.toUpperCase()+' evicts <b>page '+old+'</b> from frame '+v+'.';
+      }
+    }
+    // snapshot column
+    const snap=frames.slice();
+    for(let f=0;f<nF;f++){
+      const cell=grid.querySelector('.pr-cell[data-i="'+step+'"][data-f="'+f+'"]');
+      if(f<snap.length){cell.textContent=snap[f];cell.classList.add('fill');
+        if(snap[f]===page && fault){cell.classList.add('new');}
+      }
+      // mark victim flash on this column's changed frame
+      if(fault && victimFrame===f){cell.classList.add('victim');cell.textContent=page;}
+    }
+    const mk=grid.querySelector('.pr-mark[data-mk="'+step+'"]');
+    mk.textContent=fault?'F':'✓';mk.className='pr-mark '+(fault?'fault':'hit');
+    step++;updateStats();
+    return true;
+  }
+  function updateStats(){fEl.textContent=faults;hEl.textContent=hits;rEl.textContent=(step?Math.round(faults/step*100):0)+'%';}
+  function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;autoBtn.textContent='Auto-play ⏩';}}
+  stepBtn.addEventListener('click',doStep);
+  autoBtn.addEventListener('click',()=>{
+    if(autoTimer){stopAuto();return;}
+    autoBtn.textContent='Pause ⏸';
+    autoTimer=setInterval(()=>{if(!doStep())stopAuto();},700);
+  });
+  resetBtn.addEventListener('click',reset);
+  [refIn,frIn,algoIn].forEach(e=>e.addEventListener('change',reset));
+  reset();
+})();
+
+/* ============================================================ M4: MULTI-LEVEL TRANSLATOR */
+(function(){
+  const addrIn=document.getElementById('mlAddr'),btn=document.getElementById('mlGo'),out=document.getElementById('mlOut');
+  function go(){
+    let raw=addrIn.value.trim().replace(/^0x/i,'');
+    let val=parseInt(raw,16);
+    if(isNaN(val)||val<0||val>0xFFFFFFFF){out.innerHTML='<div class="note warn" style="margin-top:8px"><span class="tag">Invalid</span>Enter a 32-bit hex address like 0x00403ABC.</div>';return;}
+    const pd=(val>>>22)&0x3FF, pt=(val>>>12)&0x3FF, off=val&0xFFF;
+    const bin=val.toString(2).padStart(32,'0');
+    out.innerHTML='<div class="code" style="margin-top:8px">Address: 0x'+val.toString(16).toUpperCase().padStart(8,'0')+'  =  '+
+      '<span class="g">'+bin.slice(0,10)+'</span> <span class="p">'+bin.slice(10,20)+'</span> '+bin.slice(20)+' (binary)\n\n'+
+      '<span class="g">Page Directory index = '+pd+'</span>   (top 10 bits → which page table, of 1024)\n'+
+      '<span class="p">Page Table index     = '+pt+'</span>   (next 10 bits → which PTE / frame, of 1024)\n'+
+      'Offset               = '+off+'   (bottom 12 bits → byte within the 4KB frame)</div>'+
+      '<div class="flow" style="margin-top:8px"><div class="box">PD['+pd+']</div><span class="arr">→</span><div class="box alt">PT['+pt+']</div><span class="arr">→</span><div class="box dark">frame + offset '+off+'</div></div>';
+  }
+  btn.addEventListener('click',go);addrIn.addEventListener('keydown',e=>{if(e.key==='Enter')go();});go();
+})();
+
+/* ============================================================ M5: MMU RELOCATION */
+(function(){
+  const rel=document.getElementById('mmuReloc'),lg=document.getElementById('mmuLog'),
+        A=document.getElementById('mmuA'),B=document.getElementById('mmuB'),C=document.getElementById('mmuC');
+  function calc(){const R=+rel.value,L=+lg.value;A.textContent=L;B.textContent=R;C.textContent=R+L;}
+  [rel,lg].forEach(e=>e.addEventListener('input',calc));calc();
+})();
+
+/* ============================================================ M5: FIT ALGORITHMS */
+(function(){
+  const partsIn=document.getElementById('fitParts'),procIn=document.getElementById('fitProc'),algoIn=document.getElementById('fitAlgo'),
+        btn=document.getElementById('fitGo'),view=document.getElementById('fitView'),res=document.getElementById('fitResult');
+  function draw(chosen){
+    const parts=partsIn.value.trim().split(/\s+/).map(Number).filter(n=>!isNaN(n));
+    const proc=+procIn.value;const maxP=Math.max(...parts,1);
+    view.innerHTML='';
+    parts.forEach((p,i)=>{
+      const fits=p>=proc;
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:10px';
+      const bar=document.createElement('div');
+      bar.style.cssText='height:34px;border-radius:8px;width:'+(p/maxP*100)+'%;min-width:70px;display:flex;align-items:center;padding:0 12px;color:#fff;font-weight:700;font-size:.85rem;transition:.3s;background:'+
+        (chosen===i?'linear-gradient(135deg,#2A9D8F,#1f7a6f)':(fits?'linear-gradient(135deg,#FF9A00,#E07E00)':'#B9AF9E'));
+      bar.textContent=p+'K'+(chosen===i?'  ← chosen (leftover '+(p-proc)+'K)':'');
+      row.appendChild(bar);
+      const tag=document.createElement('span');tag.style.cssText='font-size:.75rem;color:var(--ink-soft)';
+      tag.textContent='partition '+i+(fits?'':' (too small)');
+      row.appendChild(tag);
+      view.appendChild(row);
+    });
+  }
+  function run(){
+    const parts=partsIn.value.trim().split(/\s+/).map(Number).filter(n=>!isNaN(n));
+    const proc=+procIn.value,algo=algoIn.value;
+    let chosen=-1;
+    if(algo==='first'){for(let i=0;i<parts.length;i++)if(parts[i]>=proc){chosen=i;break;}}
+    else if(algo==='best'){let best=Infinity;for(let i=0;i<parts.length;i++)if(parts[i]>=proc&&parts[i]<best){best=parts[i];chosen=i;}}
+    else{let worst=-1;for(let i=0;i<parts.length;i++)if(parts[i]>=proc&&parts[i]>worst){worst=parts[i];chosen=i;}}
+    draw(chosen);
+    if(chosen===-1){res.innerHTML='<div class="note warn" style="margin-top:8px"><span class="tag">No fit</span>No partition is large enough for a '+proc+'K process. It must wait.</div>';}
+    else{res.innerHTML='<div class="note analogy" style="margin-top:8px"><span class="tag">'+algoIn.options[algoIn.selectedIndex].text+' chose partition '+chosen+' ('+parts[chosen]+'K)</span>Leftover hole = '+(parts[chosen]-proc)+'K becomes new free space. '+
+      (algo==='best'?'Best-fit picked the <b>smallest</b> hole ≥ '+proc+'K → smallest leftover.':algo==='worst'?'Worst-fit picked the <b>largest</b> hole → largest leftover.':'First-fit picked the <b>first</b> hole ≥ '+proc+'K → fastest search.')+'</div>';}
+  }
+  btn.addEventListener('click',run);[partsIn,procIn,algoIn].forEach(e=>e.addEventListener('change',()=>draw(-1)));
+  draw(-1);
+})();
+
+/* ============================================================ M5: COMPACTION */
+(function(){
+  const bar=document.getElementById('fragBar'),btn=document.getElementById('fragBtn'),msg=document.getElementById('fragMsg');
+  let layout=[{t:'os',s:12,l:'OS'},{t:'proc',s:16,l:'P1'},{t:'free',s:10,l:'free'},{t:'proc',s:14,l:'P2'},{t:'free',s:8,l:'free'},{t:'proc',s:12,l:'P3'},{t:'free',s:14,l:'free'},{t:'proc',s:14,l:'P4'}];
+  function render(){
+    bar.innerHTML='';layout.forEach(seg=>{
+      const d=document.createElement('div');d.className='memseg '+seg.t;d.style.flex=seg.s;
+      d.textContent=seg.l;bar.appendChild(d);
+    });
+  }
+  render();msg.textContent='Free memory (striped) is scattered in 3 holes totalling 32 units — external fragmentation. A big process needing 20 contiguous units can’t fit even though 32 are free.';
+  btn.addEventListener('click',()=>{
+    const os=layout.filter(s=>s.t==='os');const procs=layout.filter(s=>s.t==='proc');
+    const freeTotal=layout.filter(s=>s.t==='free').reduce((a,b)=>a+b.s,0);
+    layout=[...os,...procs,{t:'free',s:freeTotal,l:'free ('+freeTotal+' contiguous)'}];
+    render();msg.innerHTML='<b style="color:#2A9D8F">Compacted!</b> All processes slid together; the '+freeTotal+' free units now form <b>one contiguous block</b> — the 20-unit process fits. (Only possible with dynamic/execution-time relocation.)';
+  });
+})();
+
+/* ============================================================ M5: PAGING TRANSLATOR */
+(function(){
+  const sizeIn=document.getElementById('pgSize'),logIn=document.getElementById('pgLog'),btn=document.getElementById('pgGo'),
+        tableEl=document.getElementById('pgTable'),out=document.getElementById('pgOut');
+  let table=[5,9,2,7,1,3]; // page->frame
+  function renderTable(){
+    tableEl.innerHTML='';
+    table.forEach((f,p)=>{
+      const w=document.createElement('div');
+      w.style.cssText='display:flex;flex-direction:column;align-items:center;gap:2px';
+      w.innerHTML='<span style="font-size:.68rem;color:var(--ink-soft);font-weight:700">page '+p+'</span>';
+      const inp=document.createElement('input');inp.type='number';inp.value=f;inp.style.cssText='width:60px;text-align:center;border:1.5px solid var(--primary-tint);border-radius:8px;padding:6px;font-weight:700';
+      inp.addEventListener('input',()=>{table[p]=+inp.value;});
+      w.appendChild(inp);
+      const lbl=document.createElement('span');lbl.style.cssText='font-size:.62rem;color:var(--primary-darker)';lbl.textContent='→ frame';
+      w.appendChild(lbl);
+      tableEl.appendChild(w);
+    });
+  }
+  function go(){
+    const ps=+sizeIn.value,la=+logIn.value;
+    const page=Math.floor(la/ps),off=la%ps;
+    if(page>=table.length){out.innerHTML='<div class="note warn" style="margin-top:8px"><span class="tag">Invalid page</span>Logical address '+la+' → page '+page+', but the page table only has pages 0–'+(table.length-1)+'. This would trigger a protection fault (invalid bit).</div>';return;}
+    const frame=table[page];const pa=frame*ps+off;
+    out.innerHTML='<div class="code" style="margin-top:8px">Logical address = '+la+'\n'+
+      'page number p = floor('+la+' / '+ps+') = <span class="g">'+page+'</span>\n'+
+      'offset      d = '+la+' mod '+ps+' = '+off+'\n\n'+
+      'page table[ '+page+' ] → frame <span class="p">'+frame+'</span>\n\n'+
+      'physical = frame×pagesize + offset = '+frame+'×'+ps+' + '+off+' = <span class="g">'+pa+'</span></div>'+
+      '<div class="flow" style="margin-top:8px"><div class="box">logical '+la+'</div><span class="arr">→</span><div class="box">p='+page+', d='+off+'</div><span class="arr">→</span><div class="box alt">frame '+frame+'</div><span class="arr">→</span><div class="box dark">physical '+pa+'</div></div>';
+  }
+  renderTable();btn.addEventListener('click',go);go();
+})();
+
+/* ============================================================ M5: TLB EAT */
+(function(){
+  const ta=document.getElementById('tlbTa'),tm=document.getElementById('tlbTm'),a=document.getElementById('tlbA'),
+        av=document.getElementById('tlbAval'),out=document.getElementById('tlbOut'),hit=document.getElementById('tlbHit'),miss=document.getElementById('tlbMiss');
+  function calc(){
+    const Ta=+ta.value,Tm=+tm.value,al=+a.value;av.textContent=al.toFixed(2);
+    const hitP=Ta+Tm,missP=Ta+2*Tm;const eat=al*hitP+(1-al)*missP;
+    out.textContent=eat.toFixed(1);hit.textContent=hitP;miss.textContent=missP;
+    out.style.color=al>0.7?'#2A9D8F':'#E07E00';
+  }
+  [ta,tm,a].forEach(e=>e.addEventListener('input',calc));calc();
+})();
+
+/* ============================================================ EXAM RAPID-FIRE QUIZ */
+(function(){
+  const qs=[
+    {q:'An interrupt caused by a running program executing a divide-by-zero is called a…',o:['Hardware interrupt','Trap (software interrupt)','DMA transfer'],c:1,e:'A trap is a software-generated interrupt — from a program instruction or a software error like divide-by-zero.'},
+    {q:'In which CPU mode can privileged instructions execute?',o:['User mode','Supervisor mode','Both equally'],c:1,e:'Only supervisor (monitor/kernel) mode can run the full instruction set; user mode is restricted to a subset.'},
+    {q:'The timer is important because it lets the OS…',o:['Speed up the disk','Regain control from a program stuck in an infinite loop','Encrypt memory'],c:1,e:'The timer interrupts after a set time, guaranteeing the OS gets the CPU back — the basis of time-sharing.'},
+    {q:'DMA reduces CPU load by generating…',o:['One interrupt per byte','One interrupt per block of data','No interrupts ever'],c:1,e:'DMA transfers whole blocks directly to memory (cycle stealing) and interrupts once per block, not per byte.'},
+    {q:'The HAL in Windows exists mainly to support which design goal?',o:['Security','Portability','Compatibility'],c:1,e:'The Hardware Abstraction Layer hides hardware specifics behind a common interface, making Windows portable across platforms.'},
+    {q:'FIFO page replacement can suffer from…',o:['Belady’s Anomaly (more frames → more faults)','Never having page faults','Internal fragmentation'],c:0,e:'Belady’s Anomaly: with FIFO, adding frames can increase faults. Optimal and LRU are immune.'},
+    {q:'Which page-replacement algorithm is optimal but impossible to implement exactly?',o:['FIFO','LRU','Optimal (replace page not used longest in the FUTURE)'],c:2,e:'Optimal needs to know the future, so it’s only a theoretical benchmark; LRU approximates it using the recent past.'},
+    {q:'Thrashing happens when…',o:['The CPU is 100% busy computing','Processes spend most time swapping pages in/out instead of executing','The disk cache is too large'],c:1,e:'Thrashing = sum of current localities > physical memory, so the system pages constantly and CPU utilisation collapses.'},
+    {q:'Paging eliminates external fragmentation because…',o:['Pages vary in size to fit holes','Any page fits in any free frame — no contiguous block needed','It compacts memory each cycle'],c:1,e:'Fixed-size interchangeable frames mean a process’s pages can be scattered anywhere; internal fragmentation can still occur on the last page.'},
+    {q:'A logical address in segmentation is a pair of…',o:['<page number, offset>','<segment number, offset>','<base, limit>'],c:1,e:'Segmentation uses <segment-number, offset>; the segment number indexes the segment table (base + limit per entry).'}
+  ];
+  const wrap=document.getElementById('examQuiz');
+  qs.forEach((item,qi)=>{
+    const div=document.createElement('div');div.className='quiz';div.setAttribute('data-quiz','');
+    let html='<div class="q"><span class="qn">'+(qi+1)+'</span> '+item.q+'</div>';
+    item.o.forEach((op,oi)=>{html+='<div class="opt" data-c="'+(oi===item.c?1:0)+'"><span class="mk"></span> '+op+'</div>';});
+    html+='<div class="explain">✅ '+item.e+'</div>';
+    div.innerHTML=html;wrap.appendChild(div);
+  });
+  wireQuiz(wrap);
+})();
+
+updateProgress();
+</script>
+</body>
+</html>
